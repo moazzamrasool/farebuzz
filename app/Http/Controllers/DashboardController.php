@@ -55,7 +55,7 @@ class DashboardController extends Controller
         $query->form_type   = $request->form_type;
         $query->save();
 
-        Mail::to(config('mail.to.address', 'info@farebuzztravel.com'))->send(new UserQueryMail($query));
+        Mail::to(config('mail.admin_address'))->send(new UserQueryMail($query));
 
         if (Mail::failures()) {
             return response()->json(['error' => 'Failed to send your message. Please try again.'], 500);
@@ -87,7 +87,7 @@ class DashboardController extends Controller
         $query->state       = $state ? $state->state : '';
         $query->destination = $city  ? $city->name   : '';
 
-        Mail::to(config('mail.to.address', 'info@farebuzztravel.com'))->send(new UserQueryMail($query));
+        Mail::to(config('mail.admin_address'))->send(new UserQueryMail($query));
 
         if (Mail::failures()) {
             return response()->json(['error' => 'Failed to send your message. Please try again.'], 500);

@@ -120,7 +120,7 @@ class HomepageContentSeeder extends Seeder
         $section = $this->section(
             'hero',
             'Hero / Banner',
-            'Your Journey Starts with FareBuzz',
+            'Your Journey Starts with FareBuzzer',
             'Flights · Hotels · Trains · Buses · Cabs & More — All in One Place',
             0
         );
@@ -327,7 +327,7 @@ class HomepageContentSeeder extends Seeder
             'social_twitter' => '#',
             'social_instagram' => '#',
             'social_youtube' => '#',
-            'copyright_text' => '© 2025 FareBuzz. All rights reserved.',
+            'copyright_text' => '© 2025 FareBuzzer. All rights reserved.',
         ]);
 
         $this->seedOnce($section, [

@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Get quote | Winify Logistics</h1>
+    <h1>Get quote | FareBuzzer</h1>
 
     <table>
         <tr>

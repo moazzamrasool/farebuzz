@@ -3,6 +3,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>@yield('title', 'FareBuzzer – Your Journey Starts Here')</title>
+  <meta property="og:site_name" content="FareBuzzer">
   @hasSection('meta_description')
     <meta name="description" content="@yield('meta_description')">
   @endif

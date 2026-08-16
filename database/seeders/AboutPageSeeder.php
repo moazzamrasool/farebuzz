@@ -21,7 +21,7 @@ class AboutPageSeeder extends Seeder
                 'scale_subheading' => 'Tours operated across the globe',
 
                 'story_heading' => 'Our Story',
-                'story_body' => '<p>FareBuzz is your trusted travel companion for flights, hotels, holidays, trains and more. We partner with the best hotels, airlines and local experts to bring you curated travel experiences at the best prices.</p>',
+                'story_body' => '<p>FareBuzzer is your trusted travel companion for flights, hotels, holidays, trains and more. We partner with the best hotels, airlines and local experts to bring you curated travel experiences at the best prices.</p>',
 
                 'mission_heading' => 'Our Mission',
                 'mission_body' => '<p>To make travel planning effortless — from the first spark of an idea to the moment you land back home with stories to tell. We believe great trips shouldn\'t require expert-level research, so we do the hard part for you.</p>',

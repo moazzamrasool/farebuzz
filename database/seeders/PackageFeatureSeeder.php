@@ -18,7 +18,7 @@ class PackageFeatureSeeder extends Seeder
             'All sightseeing as per itinerary',
             'Spice plantation entry & traditional lunch',
             'Mandovi River Sunset Cruise tickets',
-            'Dedicated FareBuzz travel guide',
+            'Dedicated FareBuzzer travel guide',
             'All applicable taxes & GST',
         ];
 

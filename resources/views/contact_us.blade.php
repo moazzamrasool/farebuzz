@@ -6,28 +6,16 @@
          <div class="col-md-5">
             <!-- <span class="sub-title ">Let's Talk</span>-->
             <h5 class="heading mb-3 " >Get In <span class="txt-color">Touch</span></h5>
-            <p class="mb-1"><strong>WINIFY PVT. LTD.</strong></p>
-            <div class="regis-add">
-               <span><img src="{{asset('admin/asset/images/location.svg')}}" width="50" ></span>
-               <div class="add-detais">
-                  <h5>Address</h5>
-                  <p>26/34,3rd Floor , Office No.201 Palmohan Mansion,Near Hotel Siddhartha,East Patel Nagar, <br> New Delhi</p>
-               </div>
-            </div>
-            <div class="regis-add ">
-               <span><img src="{{asset('admin/asset/images/phone.svg')}}" width="40" ></span>
-               <div class="add-detais">
-                  <h5>Contact Number.</h5>
-                  <p><a href="tel:+91-9266332160">+91-76699-22258/76699-22259</a></p>
-                  {{-- <a href="tel:011-71523024">011-71523024</a> --}}
-               </div>
-            </div>
+            <p class="mb-1"><strong>FareBuzzer Travel</strong></p>
+            {{-- Address/phone removed: the previous values here were a different (unrelated)
+                 company's real-world contact details. Replace with FareBuzzer Travel's actual
+                 registered address and support number once supplied. --}}
             <div class="regis-add">
                <span><img src="{{asset('admin/asset/images/email.svg')}}" width="40" ></span>
                <div class="add-detais">
                   <h5>Email Id:</h5>
                   <p>
-                     <a href="mailto:info@farebuzztravel.com">info@farebuzztravel.com</a>
+                     <a href="mailto:info@farebuzzertravel.com">info@farebuzzertravel.com</a>
                   </p>
                </div>
             </div>

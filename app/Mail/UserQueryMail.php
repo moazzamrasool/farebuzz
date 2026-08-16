@@ -23,7 +23,7 @@ class UserQueryMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Get quote | Winify Logistics')
+        return $this->subject('Get quote | FareBuzzer')
                     ->view('emails.user_query_mail');
     }
 }

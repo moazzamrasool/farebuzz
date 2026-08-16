@@ -143,7 +143,8 @@ class HomepageSectionController extends Controller
 
             foreach ($simpleFields as $field) {
                 if (in_array($field, $config['fields'], true)) {
-                    $attributes[$field] = ($row[$field] ?? '') !== '' ? $row[$field] : null;
+                    $value = ($row[$field] ?? '') !== '' ? $row[$field] : null;
+                    $attributes[$field] = $field === 'link' ? $this->stripDevHost($value) : $value;
                 }
             }
 
@@ -192,5 +193,28 @@ class HomepageSectionController extends Controller
             }
             $item->delete();
         }
+    }
+
+    // Admins sometimes paste a link copied straight from their browser's local dev
+    // environment (http://localhost:8000/...) instead of a relative path — that value
+    // would otherwise pass through App\Support\MediaUrl::link() verbatim and leak a
+    // localhost URL into production. Strip it down to a relative path so it always
+    // resolves via APP_URL instead. Real external links are left untouched.
+    private function stripDevHost(?string $value): ?string
+    {
+        if (!$value) {
+            return $value;
+        }
+
+        $host = parse_url($value, PHP_URL_HOST);
+
+        if (!in_array($host, ['localhost', '127.0.0.1'], true)) {
+            return $value;
+        }
+
+        $path = ltrim(parse_url($value, PHP_URL_PATH) ?? '', '/');
+        $query = parse_url($value, PHP_URL_QUERY);
+
+        return $path.($query ? '?'.$query : '');
     }
 }
