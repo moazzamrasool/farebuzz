@@ -182,7 +182,7 @@
           @endunless
 
           @unless($currentAdmin?->isSuperAdmin())
-            @php $homepageCmsActive = request()->is('crm/homepage-sections*', 'crm/cms-pages*', 'crm/blogs*', 'crm/navbar-menu*', 'crm/about-page*', 'crm/coupons*', 'crm/seo-settings*', 'crm/tracking-scripts*'); @endphp
+            @php $homepageCmsActive = request()->is('crm/homepage-sections*', 'crm/cms-pages*', 'crm/blogs*', 'crm/navbar-menu*', 'crm/about-page*', 'crm/homepage-seo*', 'crm/listing-page-seo*', 'crm/contact-page*', 'crm/coupons*', 'crm/seo-settings*', 'crm/tracking-scripts*'); @endphp
             <li class="nav-item {{ $homepageCmsActive ? 'menu-open' : '' }}">
               <a href="#" class="nav-link {{ $homepageCmsActive ? 'active' : '' }}">
                 <i class="fa fa-home nav-icon" aria-hidden="true"></i>
@@ -213,6 +213,30 @@
                   <a href="{{ route('crm.about-page.edit') }}" class="nav-link {{ request()->is('crm/about-page*') ? 'active' : '' }}">
                     <i class="fa fa-info-circle nav-icon" aria-hidden="true"></i>
                     <p>About Us</p>
+                  </a>
+                </li>
+                @endif
+                @if($currentAdmin?->isAdmin() || $currentAdmin?->can('homepage-seo.view'))
+                <li class="nav-item">
+                  <a href="{{ route('crm.homepage-seo.edit') }}" class="nav-link {{ request()->is('crm/homepage-seo*') ? 'active' : '' }}">
+                    <i class="fa fa-search nav-icon" aria-hidden="true"></i>
+                    <p>Homepage SEO</p>
+                  </a>
+                </li>
+                @endif
+                @if($currentAdmin?->isAdmin() || $currentAdmin?->can('listing-page-seo.view'))
+                <li class="nav-item">
+                  <a href="{{ route('crm.listing-page-seo.index') }}" class="nav-link {{ request()->is('crm/listing-page-seo*') ? 'active' : '' }}">
+                    <i class="fa fa-search nav-icon" aria-hidden="true"></i>
+                    <p>Listing Pages SEO</p>
+                  </a>
+                </li>
+                @endif
+                @if($currentAdmin?->isAdmin() || $currentAdmin?->can('contact-page.view'))
+                <li class="nav-item">
+                  <a href="{{ route('crm.contact-page.edit') }}" class="nav-link {{ request()->is('crm/contact-page*') ? 'active' : '' }}">
+                    <i class="fa fa-envelope nav-icon" aria-hidden="true"></i>
+                    <p>Contact Us</p>
                   </a>
                 </li>
                 @endif

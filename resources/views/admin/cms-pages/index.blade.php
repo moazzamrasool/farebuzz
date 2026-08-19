@@ -47,6 +47,10 @@
                       <td>{{ $cmsPage->updated_at->format('d-m-Y') }}</td>
                       <td>
                         <a href="{{ route('crm.cms-pages.edit', $cmsPage->id) }}" class="btn btn-primary btn-sm">Edit</a>
+                        <form action="{{ route('crm.cms-pages.duplicate', $cmsPage->id) }}" method="POST" class="d-inline">
+                          @csrf
+                          <button type="submit" class="btn btn-outline-secondary btn-sm" title="Create an editable copy of this page">Duplicate</button>
+                        </form>
                         <form action="{{ route('crm.cms-pages.destroy', $cmsPage->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this page?');">
                           @csrf
                           @method('DELETE')

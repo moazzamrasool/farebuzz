@@ -79,6 +79,14 @@ class SitemapGenerator
             ));
         }
 
+        if ($config['destination_packages']['included']) {
+            $urls = array_merge($urls, $this->recordUrls(
+                Destination::forSite()->where('status', 'active')->get(['slug', 'updated_at']),
+                fn ($d) => url("/destinations/{$d->slug}/packages"),
+                $config['destination_packages'],
+            ));
+        }
+
         if ($config['cms_pages']['included']) {
             $urls = array_merge($urls, $this->recordUrls(
                 CmsPage::forSite()->where('status', 'active')->get(['slug', 'updated_at']),
@@ -114,6 +122,8 @@ class SitemapGenerator
     {
         return [
             ['loc' => url('/'), 'lastmod' => null, 'changefreq' => 'daily', 'priority' => '1.0'],
+            ['loc' => url('/about-us'), 'lastmod' => null, 'changefreq' => 'monthly', 'priority' => '0.7'],
+            ['loc' => url('/contact-us'), 'lastmod' => null, 'changefreq' => 'monthly', 'priority' => '0.7'],
             ['loc' => url('/india-packages'), 'lastmod' => null, 'changefreq' => 'daily', 'priority' => '0.8'],
             ['loc' => url('/international-packages'), 'lastmod' => null, 'changefreq' => 'daily', 'priority' => '0.8'],
             ['loc' => url('/holiday-packages'), 'lastmod' => null, 'changefreq' => 'daily', 'priority' => '0.8'],
@@ -122,7 +132,6 @@ class SitemapGenerator
             ['loc' => url('/activities'), 'lastmod' => null, 'changefreq' => 'weekly', 'priority' => '0.7'],
             ['loc' => url('/destinations'), 'lastmod' => null, 'changefreq' => 'weekly', 'priority' => '0.7'],
             ['loc' => url('/blog'), 'lastmod' => null, 'changefreq' => 'daily', 'priority' => '0.6'],
-            ['loc' => url('/about-us'), 'lastmod' => null, 'changefreq' => 'monthly', 'priority' => '0.5'],
         ];
     }
 

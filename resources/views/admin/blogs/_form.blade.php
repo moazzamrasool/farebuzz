@@ -86,63 +86,20 @@
   </div>
 </div>
 
-<hr>
-<a href="#seoPanel" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="seoPanel" class="d-inline-flex align-items-center mb-2" style="text-decoration:none;">
-  <h6 class="mb-0">SEO Settings</h6>
-  <i class="fa fa-chevron-down ml-2" style="font-size:12px;"></i>
-</a>
-<div class="collapse" id="seoPanel">
-  <div class="form-group">
-    <label for="meta_title">Meta Title</label>
-    <input type="text" name="meta_title" id="meta_title" class="form-control @error('meta_title') is-invalid @enderror"
-      value="{{ old('meta_title', $blog->meta_title ?? '') }}">
-    @error('meta_title') <span class="text-danger">{{ $message }}</span> @enderror
-  </div>
-  <div class="form-group">
-    <label for="meta_description">Meta Description</label>
-    <textarea name="meta_description" id="meta_description" rows="2" maxlength="255" class="form-control @error('meta_description') is-invalid @enderror">{{ old('meta_description', $blog->meta_description ?? '') }}</textarea>
-    <small class="form-text text-muted"><span id="metaDescriptionCount">0</span>/160 characters (recommended)</small>
-    @error('meta_description') <span class="text-danger">{{ $message }}</span> @enderror
-  </div>
-  <div class="form-group">
-    <label for="meta_keywords">Meta Keywords</label>
-    <input type="text" name="meta_keywords" id="meta_keywords" class="form-control @error('meta_keywords') is-invalid @enderror"
-      value="{{ old('meta_keywords', $blog->meta_keywords ?? '') }}" placeholder="comma, separated, keywords">
-    @error('meta_keywords') <span class="text-danger">{{ $message }}</span> @enderror
-  </div>
-  <div class="form-group">
-    <label for="og_image">OG Image <small class="text-muted">shown when the post is shared on social media, size: 1200x630</small></label>
-    <input type="file" name="og_image" id="og_image" class="form-control-file @error('og_image') is-invalid @enderror" accept="image/*">
-    @error('og_image') <span class="text-danger d-block">{{ $message }}</span> @enderror
-    @isset($blog)
-      @if($blog->og_image)
-        <div class="mt-2">
-          <img src="{{ asset('storage/'.$blog->og_image) }}" style="width:120px;height:70px;object-fit:cover;border-radius:6px;">
-        </div>
-      @endif
-    @endisset
-  </div>
-  <div class="form-group">
-    <label for="canonical_url">Canonical URL</label>
-    <input type="url" name="canonical_url" id="canonical_url" class="form-control @error('canonical_url') is-invalid @enderror"
-      value="{{ old('canonical_url', $blog->canonical_url ?? '') }}" placeholder="https://farebuzzer.com/blog/... (leave blank to use this post's own URL)">
-    @error('canonical_url') <span class="text-danger">{{ $message }}</span> @enderror
+<div class="form-row">
+  <div class="form-group col-md-6">
+    <label for="reading_time">Reading Time <small class="text-muted">(minutes — leave blank to auto-estimate from content)</small></label>
+    <input type="number" name="reading_time" id="reading_time" min="1" class="form-control @error('reading_time') is-invalid @enderror"
+      value="{{ old('reading_time', $blog->reading_time ?? '') }}">
+    @error('reading_time') <span class="text-danger">{{ $message }}</span> @enderror
   </div>
 </div>
 
+@include('admin.partials._seo_fields', [
+  'seo' => $blog ?? null,
+  'seoUrl' => isset($blog) && $blog->slug ? route('blog.show', $blog->slug) : null,
+  'seoPreviewFallback' => ($blog->title ?? 'Blog Post').' – FareBuzzer',
+])
+
 <button type="submit" class="btn btn-primary">{{ isset($blog) ? 'Update' : 'Create' }} Blog Post</button>
 <a href="{{ route('crm.blogs.index') }}" class="btn btn-secondary">Cancel</a>
-
-<script>
-  (function () {
-    var $textarea = document.getElementById('meta_description');
-    var $count = document.getElementById('metaDescriptionCount');
-    if (!$textarea || !$count) return;
-
-    function update() {
-      $count.textContent = $textarea.value.length;
-    }
-    update();
-    $textarea.addEventListener('input', update);
-  })();
-</script>

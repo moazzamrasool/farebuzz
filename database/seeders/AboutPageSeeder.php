@@ -17,24 +17,14 @@ class AboutPageSeeder extends Seeder
                 'hero_heading' => 'Personalised, Once In A Lifetime Trips',
                 'hero_tagline' => 'Founded to make travel planning effortless, personal, and reliable — from the first spark of an idea to the moment you land back home with stories to tell.',
 
-                'scale_heading' => 'Proof We Operate at Scale',
-                'scale_subheading' => 'Tours operated across the globe',
-
                 'story_heading' => 'Our Story',
                 'story_body' => '<p>FareBuzzer is your trusted travel companion for flights, hotels, holidays, trains and more. We partner with the best hotels, airlines and local experts to bring you curated travel experiences at the best prices.</p>',
 
                 'mission_heading' => 'Our Mission',
                 'mission_body' => '<p>To make travel planning effortless — from the first spark of an idea to the moment you land back home with stories to tell. We believe great trips shouldn\'t require expert-level research, so we do the hard part for you.</p>',
 
-                'founded_year' => 2015,
-
                 'team_heading' => 'The Talent Behind Every Journey',
                 'team_subheading' => 'A small, obsessive team of travel planners, engineers and support experts.',
-
-                'stat1_label' => 'Happy Travellers', 'stat1_value' => '50,000+', 'stat1_source' => null,
-                'stat2_label' => 'Destinations', 'stat2_value' => null, 'stat2_source' => 'destinations_count',
-                'stat3_label' => 'Partner Hotels', 'stat3_value' => null, 'stat3_source' => 'hotels_count',
-                'stat4_label' => 'Years in Business', 'stat4_value' => null, 'stat4_source' => 'years_since_founded',
 
                 'feature1_icon' => 'bi-shield-check', 'feature1_title' => 'Trusted Partners', 'feature1_description' => 'We work only with verified hotels, airlines and local experts.',
                 'feature2_icon' => 'bi-tag', 'feature2_title' => 'Best Prices', 'feature2_description' => 'Handpicked packages at the most competitive prices, guaranteed.',
@@ -61,21 +51,6 @@ class AboutPageSeeder extends Seeder
 
                 'awards_heading' => 'Awards & Recognition',
 
-                'cta_heading' => 'Ready for your next trip?',
-                'cta_text' => 'Explore handpicked holiday packages across India and abroad.',
-                'cta_button_text' => 'Explore Packages',
-                'cta_button_link' => '/india-packages',
-
-                'cta2_heading' => 'Partner With FareBuzzer',
-                'cta2_text' => 'Run a hotel, resort or travel service? Grow your business with us.',
-                'cta2_button_text' => 'Partner With Us',
-                'cta2_button_link' => '/partner-with-us',
-
-                'career_heading' => 'Explore a Career Where Travel Ignites You',
-                'career_text' => 'Join a team that\'s as passionate about travel as you are.',
-                'career_button_text' => 'View Openings',
-                'career_button_link' => '/careers',
-
                 'meta_title' => 'About Us – FareBuzzer',
             ]
         );
@@ -88,12 +63,12 @@ class AboutPageSeeder extends Seeder
                 ['title' => 'Constant Improvement', 'subtitle' => 'bi-graph-up-arrow', 'description' => 'We ship better itineraries and better support every quarter.'],
             ],
             'team_member' => [
-                ['title' => 'Aisha Khan', 'subtitle' => 'Co-Founder & CEO'],
-                ['title' => 'Rohan Mehta', 'subtitle' => 'Head of Product'],
-                ['title' => 'Priya Sharma', 'subtitle' => 'Head of Operations'],
-                ['title' => 'Farhan Ali', 'subtitle' => 'Head of Partnerships'],
-                ['title' => 'Neha Verma', 'subtitle' => 'Customer Experience Lead'],
-                ['title' => 'Sameer Iqbal', 'subtitle' => 'Engineering Lead'],
+                ['title' => 'Aisha Khan', 'subtitle' => 'Co-Founder & CEO', 'image_url' => 'frontend/img/about/team-1.svg'],
+                ['title' => 'Rohan Mehta', 'subtitle' => 'Head of Product', 'image_url' => 'frontend/img/about/team-2.svg'],
+                ['title' => 'Priya Sharma', 'subtitle' => 'Head of Operations', 'image_url' => 'frontend/img/about/team-3.svg'],
+                ['title' => 'Farhan Ali', 'subtitle' => 'Head of Partnerships', 'image_url' => 'frontend/img/about/team-4.svg'],
+                ['title' => 'Neha Verma', 'subtitle' => 'Customer Experience Lead', 'image_url' => 'frontend/img/about/team-5.svg'],
+                ['title' => 'Sameer Iqbal', 'subtitle' => 'Engineering Lead', 'image_url' => 'frontend/img/about/team-6.svg'],
             ],
             'growth_stat' => [
                 ['title' => '20%', 'subtitle' => '2021'],
@@ -121,18 +96,17 @@ class AboutPageSeeder extends Seeder
                 ['title' => 'Vikram S.', 'subtitle' => 'Operations', 'description' => 'FareBuzzer trusts its team with real ownership. My ideas for improving the booking flow shipped within weeks.'],
                 ['title' => 'Meera J.', 'subtitle' => 'Product', 'description' => 'A genuinely supportive team — we celebrate wins together and learn from misses just as openly.'],
             ],
+            // Press/award/trust-badge images are served locally (frontend/img/about/*.svg) rather
+            // than hotlinked from placehold.co — that free service rate-limits/blocks hotlinking
+            // in production, which was rendering these as blank boxes on the live site.
             'press' => [
-                ['title' => 'Travel Weekly', 'image_url' => 'https://placehold.co/160x50?text=Travel+Weekly'],
-                ['title' => 'Economic Times', 'image_url' => 'https://placehold.co/160x50?text=Economic+Times'],
-                ['title' => 'YourStory', 'image_url' => 'https://placehold.co/160x50?text=YourStory'],
+                ['title' => 'Travel Weekly', 'image_url' => 'frontend/img/about/press-1.svg'],
+                ['title' => 'Economic Times', 'image_url' => 'frontend/img/about/press-2.svg'],
+                ['title' => 'YourStory', 'image_url' => 'frontend/img/about/press-3.svg'],
             ],
             'award' => [
-                ['title' => 'Best Travel Startup 2023', 'image_url' => 'https://placehold.co/100x100?text=Award'],
-                ['title' => 'Top Rated on Trustpilot', 'image_url' => 'https://placehold.co/100x100?text=Trustpilot'],
-            ],
-            'trust_badge' => [
-                ['title' => 'IATA Accredited', 'image_url' => 'https://placehold.co/130x40?text=IATA'],
-                ['title' => 'ISO 9001 Certified', 'image_url' => 'https://placehold.co/130x40?text=ISO+9001'],
+                ['title' => 'Best Travel Startup 2023', 'image_url' => 'frontend/img/about/award-1.svg'],
+                ['title' => 'Top Rated on Trustpilot', 'image_url' => 'frontend/img/about/award-2.svg'],
             ],
         ];
 

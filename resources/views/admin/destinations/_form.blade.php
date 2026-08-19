@@ -57,38 +57,32 @@
 <h5 class="mb-3">SEO</h5>
 
 <div class="form-group">
-  <label for="meta_title">Meta Title</label>
-  <input type="text" name="meta_title" id="meta_title" class="form-control @error('meta_title') is-invalid @enderror"
-    value="{{ old('meta_title', $destination->meta_title ?? '') }}" maxlength="255" placeholder="e.g. Kashmir Tour Packages | Best Deals 2026 | FareBuzzer Travel">
-  @error('meta_title') <span class="text-danger">{{ $message }}</span> @enderror
-</div>
-
-<div class="form-group">
-  <label for="meta_description">Meta Description</label>
-  <textarea name="meta_description" id="meta_description" rows="3" class="form-control @error('meta_description') is-invalid @enderror"
-    maxlength="500" placeholder="e.g. Explore Kashmir with FareBuzzer Travel...">{{ old('meta_description', $destination->meta_description ?? '') }}</textarea>
-  @error('meta_description') <span class="text-danger">{{ $message }}</span> @enderror
-</div>
-
-<div class="form-group">
-  <label for="meta_keywords">Meta Keywords <small class="text-muted">(comma-separated)</small></label>
-  <input type="text" name="meta_keywords" id="meta_keywords" class="form-control @error('meta_keywords') is-invalid @enderror"
-    value="{{ old('meta_keywords', $destination->meta_keywords ?? '') }}" maxlength="255" placeholder="e.g. kashmir tour package, kashmir honeymoon package">
-  @error('meta_keywords') <span class="text-danger">{{ $message }}</span> @enderror
-</div>
-
-<div class="form-group">
-  <label for="focus_keyword">Focus Keyword</label>
-  <input type="text" name="focus_keyword" id="focus_keyword" class="form-control @error('focus_keyword') is-invalid @enderror"
-    value="{{ old('focus_keyword', $destination->focus_keyword ?? '') }}" maxlength="255" placeholder="e.g. Kashmir tour package from Delhi">
-  @error('focus_keyword') <span class="text-danger">{{ $message }}</span> @enderror
-</div>
-
-<div class="form-group">
   <label for="seo_content">Long-form SEO Content</label>
   <textarea name="seo_content" id="seo_content" rows="8" class="form-control rich-text-editor @error('seo_content') is-invalid @enderror"
     placeholder="e.g. Kashmir, often called Paradise on Earth...">{{ old('seo_content', $destination->seo_content ?? '') }}</textarea>
   @error('seo_content') <span class="text-danger">{{ $message }}</span> @enderror
+</div>
+
+@include('admin.partials._seo_fields', [
+  'seo' => $destination ?? null,
+  'seoUrl' => isset($destination) && $destination->slug ? route('destinations.show', $destination->slug) : null,
+  'seoPreviewFallback' => ($destination->name ?? 'Destination').' – FareBuzzer Travel',
+])
+
+<hr>
+<h5 class="mb-3">Packages Listing SEO <small class="text-muted">(for the "{{ $destination->name ?? 'this destination' }} Packages" page, separate from the destination page above)</small></h5>
+
+<div class="form-group">
+  <label for="packages_meta_title">Packages Page Meta Title</label>
+  <input type="text" name="packages_meta_title" id="packages_meta_title" class="form-control @error('packages_meta_title') is-invalid @enderror"
+    value="{{ old('packages_meta_title', $destination->packages_meta_title ?? '') }}" maxlength="255">
+  @error('packages_meta_title') <span class="text-danger">{{ $message }}</span> @enderror
+</div>
+
+<div class="form-group">
+  <label for="packages_meta_description">Packages Page Meta Description</label>
+  <textarea name="packages_meta_description" id="packages_meta_description" rows="3" maxlength="500" class="form-control @error('packages_meta_description') is-invalid @enderror">{{ old('packages_meta_description', $destination->packages_meta_description ?? '') }}</textarea>
+  @error('packages_meta_description') <span class="text-danger">{{ $message }}</span> @enderror
 </div>
 
 <div class="form-group">

@@ -35,11 +35,17 @@ class ActivityController extends Controller
     public function store(ActivityRequest $request)
     {
         $data = $request->validated();
-        unset($data['image']);
+        unset($data['image'], $data['og_image']);
         $data['slug'] = $this->generateUniqueSlug(Activity::class, $request->name);
+        $data['robots_index'] = $request->boolean('robots_index');
+        $data['robots_follow'] = $request->boolean('robots_follow');
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('activities', 'public');
+        }
+
+        if ($request->hasFile('og_image')) {
+            $data['og_image'] = $request->file('og_image')->store('activities/og', 'public');
         }
 
         $activity = Activity::create($data);
@@ -85,7 +91,9 @@ class ActivityController extends Controller
     public function update(ActivityRequest $request, Activity $activity)
     {
         $data = $request->validated();
-        unset($data['image']);
+        unset($data['image'], $data['og_image']);
+        $data['robots_index'] = $request->boolean('robots_index');
+        $data['robots_follow'] = $request->boolean('robots_follow');
 
         if ($activity->name !== $request->name) {
             $data['slug'] = $this->generateUniqueSlug(Activity::class, $request->name, $activity->id);
@@ -96,6 +104,13 @@ class ActivityController extends Controller
                 Storage::disk('public')->delete($activity->image);
             }
             $data['image'] = $request->file('image')->store('activities', 'public');
+        }
+
+        if ($request->hasFile('og_image')) {
+            if ($activity->og_image) {
+                Storage::disk('public')->delete($activity->og_image);
+            }
+            $data['og_image'] = $request->file('og_image')->store('activities/og', 'public');
         }
 
         $activity->update($data);

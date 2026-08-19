@@ -18,9 +18,8 @@ class SearchTabSettingSeeder extends Seeder
             ['tab_key' => 'activities','label' => 'Activities',       'enabled' => true,  'sort_order' => 2],
             ['tab_key' => 'flights',   'label' => 'Flights',          'enabled' => false, 'sort_order' => 3],
             ['tab_key' => 'homestays', 'label' => 'Homestays',        'enabled' => false, 'sort_order' => 4],
-            ['tab_key' => 'trains',    'label' => 'Trains',           'enabled' => false, 'sort_order' => 5],
-            ['tab_key' => 'buses',     'label' => 'Buses',            'enabled' => false, 'sort_order' => 6],
-            ['tab_key' => 'cabs',      'label' => 'Cabs',             'enabled' => false, 'sort_order' => 7],
+            ['tab_key' => 'buses',     'label' => 'Buses',            'enabled' => false, 'sort_order' => 5],
+            ['tab_key' => 'cabs',      'label' => 'Cabs',             'enabled' => false, 'sort_order' => 6],
         ];
 
         foreach ($tabs as $tab) {

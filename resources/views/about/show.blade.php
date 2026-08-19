@@ -1,7 +1,15 @@
 @extends('layouts.app')
 
-@section('title', $about->meta_title ?: 'About Us – FareBuzzer')
-@section('meta_description', $about->meta_description ?: $about->hero_tagline)
+@php
+  $seo = \App\Support\Seo\SeoResolver::resolve(
+    $about,
+    'About Us – FareBuzzer',
+    $about->hero_tagline ?: $about->story_body,
+    $about->hero_image,
+    route('about-us'),
+  );
+@endphp
+@include('partials._seo_head', ['seo' => $seo])
 
 @push('styles')
 <style>
@@ -10,21 +18,12 @@
 
   .about-eyebrow { color: var(--orange); font-weight: 700; }
 
-  /* Hero */
-  .about-hero { background: #f5f8ff; padding: 64px 0; }
-  .about-hero h1 { font-size: 40px; font-weight: 800; color: #111; margin-bottom: 14px; line-height: 1.25; }
-  .about-hero p { font-size: 17px; color: #555; max-width: 480px; }
-  .about-hero-img { width: 100%; height: 340px; object-fit: cover; border-radius: 16px; }
-
-  /* Scale / stats */
-  .about-scale { background: linear-gradient(135deg, var(--navy1) 0%, var(--navy2) 55%, var(--navy3) 100%); padding: 56px 0 40px; }
-  .about-scale h2 { color: #fff; font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 4px; }
-  .about-scale .sub { color: rgba(255,255,255,0.7); text-align: center; margin-bottom: 32px; font-size: 14px; }
-  .about-stat-num { font-size: 34px; font-weight: 800; color: #fff; }
-  .about-stat-label { font-size: 14px; color: rgba(255,255,255,0.75); margin-top: 4px; }
-  .about-badges { margin-top: 40px; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.12); display: flex; flex-wrap: wrap; gap: 28px; align-items: center; justify-content: center; }
-  .about-badges img { height: 40px; max-width: 130px; object-fit: contain; filter: grayscale(1) brightness(2); opacity: .85; }
-  .about-badges a { display: inline-flex; }
+  /* Hero — full-width background image, centered text, dark overlay for contrast */
+  .about-hero { position: relative; min-height: 320px; display: flex; align-items: center; justify-content: center; text-align: center; background-color: #f5f8ff; background-size: cover; background-position: center; padding: 48px 24px; }
+  .about-hero::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.4); }
+  .about-hero .container { position: relative; z-index: 1; }
+  .about-hero h1 { font-size: 40px; font-weight: 800; color: #fff; margin-bottom: 14px; line-height: 1.25; }
+  .about-hero p { font-size: 17px; color: rgba(255,255,255,0.92); max-width: 640px; margin: 0 auto; }
 
   /* Split sections (story / mission / life / impact) */
   .about-split { padding: 56px 0; }
@@ -119,30 +118,12 @@
   .awards-strip { display: flex; flex-wrap: wrap; gap: 28px; align-items: center; justify-content: center; }
   .awards-strip img { height: 70px; width: 70px; object-fit: contain; }
 
-  /* CTA banners */
-  .about-cta { padding: 52px 0; text-align: center; }
-  .about-cta h2 { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
-  .about-cta p { margin-bottom: 22px; }
-  .about-cta .btn { font-weight: 700; padding: 12px 32px; border-radius: 30px; border: none; }
-  .about-cta.cta-orange { background: var(--orange); }
-  .about-cta.cta-orange h2, .about-cta.cta-orange p { color: #fff; }
-  .about-cta.cta-orange p { color: rgba(255,255,255,0.9); }
-  .about-cta.cta-orange .btn { background: #fff; color: var(--orange); }
-  .about-cta.cta-orange .btn:hover { background: #111; color: #fff; }
-  .about-cta.cta-navy { background: linear-gradient(135deg, var(--navy1) 0%, var(--navy2) 55%, var(--navy3) 100%); }
-  .about-cta.cta-navy h2 { color: #fff; }
-  .about-cta.cta-navy p { color: rgba(255,255,255,0.75); }
-  .about-cta.cta-navy .btn { background: var(--orange); color: #fff; }
-  .about-cta.cta-navy .btn:hover { background: #fff; color: var(--orange); }
-
   @media(max-width:767px) {
-    .about-hero { padding: 44px 0; text-align: center; }
+    .about-hero { min-height: 240px; padding: 32px 24px; }
     .about-hero h1 { font-size: 28px; }
-    .about-hero p { margin: 0 auto; }
-    .about-hero-img { height: 220px; margin-top: 24px; }
     .about-split { padding: 36px 0; }
     .about-split-img { height: 220px; margin-bottom: 24px; }
-    .about-scale, .about-why, .about-growth, .about-timeline, .about-gallery, .about-testimonials, .about-press, .about-awards, .about-cta { padding: 36px 0; }
+    .about-why, .about-growth, .about-timeline, .about-gallery, .about-testimonials, .about-press, .about-awards { padding: 36px 0; }
     .growth-chart { gap: 10px; }
   }
 </style>
@@ -151,51 +132,12 @@
 @section('content')
 
 {{-- Hero --}}
-<section class="about-hero">
+<section class="about-hero" style="background-image:url('{{ \App\Support\MediaUrl::resolve($about->hero_image) ?: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=80' }}');">
   <div class="container">
-    <div class="row align-items-center g-4">
-      <div class="col-12 col-md-6">
-        <h1>{{ $about->hero_heading ?: 'About FareBuzzer' }}</h1>
-        <p>{{ $about->hero_tagline ?: 'Founded to make travel planning effortless, personal, and reliable.' }}</p>
-      </div>
-      <div class="col-12 col-md-6">
-        <img class="about-hero-img" src="{{ \App\Support\MediaUrl::resolve($about->hero_image) ?: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=900&q=80' }}" alt="{{ $about->hero_heading }}">
-      </div>
-    </div>
+    <h1>{{ $about->hero_heading ?: 'About FareBuzzer' }}</h1>
+    <p>{{ $about->hero_tagline ?: 'Founded to make travel planning effortless, personal, and reliable.' }}</p>
   </div>
 </section>
-
-{{-- Scale / stats --}}
-@php $stats = $about->resolvedStats(); @endphp
-@if(count($stats) || $items['trust_badge']->isNotEmpty())
-<section class="about-scale">
-  <div class="container">
-    @if($about->scale_heading)<h2>{{ $about->scale_heading }}</h2>@endif
-    @if($about->scale_subheading)<div class="sub">{{ $about->scale_subheading }}</div>@endif
-    @if(count($stats))
-      <div class="row g-4 text-center">
-        @foreach($stats as $stat)
-          <div class="col-6 col-md-3">
-            <div class="about-stat-num">{{ $stat['value'] }}</div>
-            <div class="about-stat-label">{{ $stat['label'] }}</div>
-          </div>
-        @endforeach
-      </div>
-    @endif
-    @if($items['trust_badge']->isNotEmpty())
-      <div class="about-badges">
-        @foreach($items['trust_badge'] as $badge)
-          @if($badge->link)
-            <a href="{{ $badge->link }}" target="_blank" rel="noopener"><img src="{{ \App\Support\MediaUrl::resolve($badge->image) }}" alt="{{ $badge->title }}"></a>
-          @else
-            <img src="{{ \App\Support\MediaUrl::resolve($badge->image) }}" alt="{{ $badge->title }}">
-          @endif
-        @endforeach
-      </div>
-    @endif
-  </div>
-</section>
-@endif
 
 {{-- Our Story --}}
 @if($about->story_heading || $about->story_body)
@@ -253,7 +195,7 @@
       @foreach($items['team_member'] as $member)
         <div class="col-6 col-md-2">
           <div class="team-member">
-            <img src="{{ \App\Support\MediaUrl::resolve($member->image) ?: 'https://ui-avatars.com/api/?name='.urlencode($member->title ?: '?').'&background=005fcc&color=fff' }}" alt="{{ $member->title }}">
+            <img src="{{ \App\Support\MediaUrl::resolve($member->image) ?: asset('frontend/img/about/avatar-generic.svg') }}" alt="{{ $member->title }}">
             <h6>{{ $member->title }}</h6>
             <span>{{ $member->subtitle }}</span>
           </div>
@@ -438,41 +380,6 @@
         <img src="{{ \App\Support\MediaUrl::resolve($award->image) }}" alt="{{ $award->title }}">
       @endforeach
     </div>
-  </div>
-</section>
-@endif
-
-{{-- Primary CTA --}}
-<section class="about-cta cta-orange">
-  <div class="container">
-    <h2>{{ $about->cta_heading ?: 'Ready for your next trip?' }}</h2>
-    @if($about->cta_text)<p>{{ $about->cta_text }}</p>@endif
-    <a href="{{ $about->cta_button_link ?: route('packages.india') }}" class="btn">{{ $about->cta_button_text ?: 'Explore Packages' }}</a>
-  </div>
-</section>
-
-{{-- Secondary CTA --}}
-@if($about->cta2_heading)
-<section class="about-cta cta-navy">
-  <div class="container">
-    <h2>{{ $about->cta2_heading }}</h2>
-    @if($about->cta2_text)<p>{{ $about->cta2_text }}</p>@endif
-    @if($about->cta2_button_text)
-      <a href="{{ $about->cta2_button_link ?: '#' }}" class="btn">{{ $about->cta2_button_text }}</a>
-    @endif
-  </div>
-</section>
-@endif
-
-{{-- Career banner --}}
-@if($about->career_heading)
-<section class="about-cta cta-navy">
-  <div class="container">
-    <h2>{{ $about->career_heading }}</h2>
-    @if($about->career_text)<p>{{ $about->career_text }}</p>@endif
-    @if($about->career_button_text)
-      <a href="{{ $about->career_button_link ?: '/careers' }}" class="btn">{{ $about->career_button_text }}</a>
-    @endif
   </div>
 </section>
 @endif

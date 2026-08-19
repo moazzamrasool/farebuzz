@@ -137,4 +137,12 @@ return [
 
     'company_unique_id' => env('COMPANY_UNIQUE_ID'),
 
+    // Support/sales numbers shown on call-to-action buttons across the frontend.
+    'contact_phone' => env('CONTACT_PHONE_NUMBER'),
+    'contact_whatsapp' => env('CONTACT_WHATSAPP_NUMBER', env('CONTACT_PHONE_NUMBER')),
+
+    // Tawk.to live chat widget — see .env for where to find these in the Tawk.to dashboard.
+    'tawkto_property_id' => env('TAWKTO_PROPERTY_ID'),
+    'tawkto_widget_id' => env('TAWKTO_WIDGET_ID'),
+
 ];

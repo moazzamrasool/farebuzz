@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Destination;
 use App\Models\HolidayPackage;
+use App\Models\ListingPageSeo;
 use App\Models\TravelCategory;
 use App\Support\SiteTenant;
 use Closure;
@@ -16,12 +17,12 @@ class PackageController extends Controller
 {
     public function india(Request $request)
     {
-        return $this->destinationGrid('domestic', 'India Packages', "Explore India's most sought-after travel destinations");
+        return $this->destinationGrid('domestic', 'India Packages', "Explore India's most sought-after travel destinations", ListingPageSeo::forSitePage('india-packages'));
     }
 
     public function international(Request $request)
     {
-        return $this->destinationGrid('international', 'International Packages', "Explore the world's most sought-after travel destinations");
+        return $this->destinationGrid('international', 'International Packages', "Explore the world's most sought-after travel destinations", ListingPageSeo::forSitePage('international-packages'));
     }
 
     public function byDestination(Request $request, Destination $destination)
@@ -34,7 +35,8 @@ class PackageController extends Controller
             "Handpicked holiday packages in {$destination->name}",
             fn ($query) => $query->whereHas('destination', fn ($d) => $d->where('local', $destination->local)),
             $destination->local,
-            $destination
+            $destination,
+            $destination->packagesSeo()
         );
     }
 
@@ -74,7 +76,7 @@ class PackageController extends Controller
         '2l_plus' => [200000, null],
     ];
 
-    private function listing(Request $request, string $heading, string $subheading, Closure $scope, ?string $local = null, ?Destination $scopedDestination = null)
+    private function listing(Request $request, string $heading, string $subheading, Closure $scope, ?string $local = null, ?Destination $scopedDestination = null, ?object $pageSeo = null)
     {
         $query = $scope(HolidayPackage::forSite()
             ->with(['destination', 'photos', 'categories', 'hotels', 'inclusionFeatures', 'customInclusions', 'reviews'])
@@ -136,13 +138,13 @@ class PackageController extends Controller
 
         return view('packages.index', compact(
             'packages', 'heading', 'subheading', 'categories', 'destinations', 'hotelCategories',
-            'local', 'scopedDestination'
+            'local', 'scopedDestination', 'pageSeo'
         ));
     }
 
     // Destination grid shown on the India/International landing pages — one
     // card per destination with an aggregated active-package count.
-    private function destinationGrid(string $local, string $heading, string $subheading)
+    private function destinationGrid(string $local, string $heading, string $subheading, ?ListingPageSeo $pageSeo = null)
     {
         $destinations = Destination::forSite()
             ->where('status', 'active')
@@ -154,6 +156,6 @@ class PackageController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('packages.destinations', compact('destinations', 'heading', 'subheading'));
+        return view('packages.destinations', compact('destinations', 'heading', 'subheading', 'pageSeo'));
     }
 }

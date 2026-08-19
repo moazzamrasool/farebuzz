@@ -1,89 +1,215 @@
 @extends('layouts.app')
+
+@php
+  $seo = \App\Support\Seo\SeoResolver::resolve(
+    $contactPage,
+    'Contact Us – FareBuzzer',
+    'Get in touch with FareBuzzer Travel — reach out for holiday packages, hotel bookings and travel support.',
+    null,
+    route('contact_us'),
+  );
+@endphp
+@include('partials._seo_head', ['seo' => $seo])
+
+@push('styles')
+<style>
+  :root { --fb-blue:#005fcc; --fb-orange:#f47b20; }
+
+  .contact-hero {
+    background: linear-gradient(135deg, #050e24 0%, #0a1d4a 55%, #0d2d73 100%);
+    padding: 64px 0 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .contact-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1800&q=80') center/cover no-repeat;
+    opacity: 0.15;
+  }
+  .contact-hero-inner { position: relative; z-index: 2; text-align: center; }
+  .contact-hero h1 { color: #fff; font-size: clamp(26px, 4vw, 40px); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 10px; }
+  .contact-hero h1 span { color: var(--fb-orange); }
+  .contact-hero p { color: rgba(255,255,255,0.7); font-size: 14px; max-width: 560px; margin: 0 auto; }
+
+  .contact-wrap { margin-top: -64px; position: relative; z-index: 3; padding-bottom: 64px; }
+
+  .contact-info-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    border: 1px solid #eef1f8;
+    margin-bottom: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .contact-info-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.09); }
+  .contact-info-icon {
+    width: 46px; height: 46px; border-radius: 12px;
+    background: #f0f6ff; color: var(--fb-blue);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px; flex-shrink: 0;
+  }
+  .contact-info-card h6 { font-size: 13px; font-weight: 700; color: #111; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+  .contact-info-card p, .contact-info-card a { font-size: 14px; color: #444; margin: 0; text-decoration: none; line-height: 1.5; }
+  .contact-info-card a:hover { color: var(--fb-blue); }
+
+  .contact-form-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.08);
+    border: 1px solid #eef1f8;
+    height: 100%;
+  }
+  .contact-form-card h4 { font-weight: 800; font-size: 22px; color: #111; margin-bottom: 6px; }
+  .contact-form-card .sub { color: #666; font-size: 13px; margin-bottom: 22px; }
+
+  .cf-label { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block; }
+  .cf-control {
+    border: 1.5px solid #e2e6f0; border-radius: 10px; padding: 12px 14px;
+    font-size: 14px; width: 100%; outline: none; background: #fbfbfd;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  }
+  .cf-control:focus { border-color: var(--fb-blue); box-shadow: 0 0 0 3px rgba(0,95,204,0.1); background: #fff; }
+  textarea.cf-control { resize: vertical; min-height: 110px; }
+
+  .btn-contact-submit {
+    background: linear-gradient(135deg, #0d5cff 0%, #0046d5 100%);
+    color: #fff; border: none; border-radius: 10px;
+    padding: 13px 20px; font-size: 15px; font-weight: 700;
+    width: 100%; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 6px 20px rgba(0,70,213,0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .btn-contact-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(0,70,213,0.35); }
+  .btn-contact-submit:active { transform: translateY(0); }
+
+  .contact-map-card {
+    border-radius: 20px; overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    border: 1px solid #eef1f8;
+  }
+  .contact-map-card iframe { display: block; width: 100%; }
+
+  @media (max-width: 767px) {
+    .contact-wrap { margin-top: -44px; }
+    .contact-form-card { padding: 22px; }
+    .contact-hero { padding: 48px 0 80px; }
+  }
+</style>
+@endpush
+
 @section('content')
-<div class="pad100  bg-white" id="letst-get-started">
-   <div class="container-fluid">
-      <div class="row">
-         <div class="col-md-5">
-            <!-- <span class="sub-title ">Let's Talk</span>-->
-            <h5 class="heading mb-3 " >Get In <span class="txt-color">Touch</span></h5>
-            <p class="mb-1"><strong>FareBuzzer Travel</strong></p>
-            {{-- Address/phone removed: the previous values here were a different (unrelated)
-                 company's real-world contact details. Replace with FareBuzzer Travel's actual
-                 registered address and support number once supplied. --}}
-            <div class="regis-add">
-               <span><img src="{{asset('admin/asset/images/email.svg')}}" width="40" ></span>
-               <div class="add-detais">
-                  <h5>Email Id:</h5>
-                  <p>
-                     <a href="mailto:info@farebuzzertravel.com">info@farebuzzertravel.com</a>
-                  </p>
-               </div>
-            </div>
-         </div>
-         <div class="col-md-7">
-            <div class="contact-box">
-               <form id="contact_form" >
-                    @csrf
-                  <div class="row">
-                     <div class="col-md-6">
-                        <div class="form-group">
-                           <input type="text" class="form-control" name="name" id="name" required="" placeholder="Name">
-                        </div>
-                     </div>
-                     <div class="col-md-6">
-                        <div class="form-group">
-                           <input type="email" class="form-control" name="email" id="email" required="" placeholder="Email Id">
-                        </div>
-                     </div>
-                     <div class="col-md-12">
-                        <div class="form-group">
-                           <input type="text" class="form-control" name="phone" id="phone" required="" placeholder="Phone Number" maxlength="10" size="10" pattern="[0-9]{10}" onkeypress="return isNumberKey(event,this)">
-                        </div>
-                     </div>
-                     <div class="col-md-12">
-                        <div class="form-group">
-                           <textarea type="textarea" id="message" required="" name="message" class="form-control" placeholder="Message" rows="4"></textarea>
-                        </div>
-                     </div>
-                     <input type="hidden" name="form_type" value="contact_us">
-                     <div class="col-md-12 ">
-                        <button type="submit" value="submit" name="submit" class="corier-btn form-btn mt-4 ">SUBMIT </button>
-                     </div>
-                  </div>
-               </form>
-            </div>
-         </div>
+
+<div class="contact-hero">
+  <div class="container contact-hero-inner">
+    <h1>Get In <span>Touch</span></h1>
+    <p>Have a question about flights, hotels or holiday packages? Our travel experts at FareBuzzer are here to help you plan your next trip.</p>
+  </div>
+</div>
+
+<div class="contact-wrap">
+  <div class="container">
+    <div class="row g-4 align-items-stretch">
+      <div class="col-lg-5">
+
+        @if($contactPage->address)
+        <div class="contact-info-card">
+          <div class="contact-info-icon"><i class="bi bi-geo-alt-fill"></i></div>
+          <div>
+            <h6>Address</h6>
+            <p>{{ $contactPage->address }}</p>
+          </div>
+        </div>
+        @endif
+
+        @if($contactPage->phone)
+        <div class="contact-info-card">
+          <div class="contact-info-icon"><i class="bi bi-telephone-fill"></i></div>
+          <div>
+            <h6>Phone</h6>
+            <a href="tel:{{ $contactPage->phone }}">{{ $contactPage->phone }}</a>
+          </div>
+        </div>
+        @endif
+
+        <div class="contact-info-card">
+          <div class="contact-info-icon"><i class="bi bi-envelope-fill"></i></div>
+          <div>
+            <h6>Email Id</h6>
+            <a href="mailto:{{ $contactPage->email ?: 'info@farebuzzertravel.com' }}">{{ $contactPage->email ?: 'info@farebuzzertravel.com' }}</a>
+          </div>
+        </div>
+
+        @if($contactPage->support_hours)
+        <div class="contact-info-card">
+          <div class="contact-info-icon"><i class="bi bi-clock-fill"></i></div>
+          <div>
+            <h6>Support Hours</h6>
+            <p>{{ $contactPage->support_hours }}</p>
+          </div>
+        </div>
+        @endif
+
       </div>
-   </div>
-</div>
-</div>
-<div class="pad800 ">
-   <div class="map">
-      <iframe src="https://www.google.com/maps/embed?pb=!1m13!1m8!1m3!1d7003.038252867398!2d77.173711!3d28.644171!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMjjCsDM4JzM5LjAiTiA3N8KwMTAnMzQuNiJF!5e0!3m2!1sen!2sin!4v1764361223693!5m2!1sen!2sin" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-   </div>
+
+      <div class="col-lg-7">
+        <div class="contact-form-card">
+          <h4>Send us a Message</h4>
+          <p class="sub">Fill out the form below and our team will get back to you within 24 hours.</p>
+          <form id="contact_form">
+            @csrf
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="cf-label">Name</label>
+                <input type="text" class="cf-control" name="name" id="name" required placeholder="Your full name">
+              </div>
+              <div class="col-md-6">
+                <label class="cf-label">Email Id</label>
+                <input type="email" class="cf-control" name="email" id="email" required placeholder="you@example.com">
+              </div>
+              <div class="col-md-12">
+                <label class="cf-label">Phone Number</label>
+                <input type="tel" class="cf-control" name="phone" id="phone" required placeholder="10-digit mobile number" maxlength="10" inputmode="numeric" pattern="[0-9]{10}">
+              </div>
+              <div class="col-md-12">
+                <label class="cf-label">Message</label>
+                <textarea id="message" required name="message" class="cf-control" placeholder="Tell us how we can help..." rows="4"></textarea>
+              </div>
+              <input type="hidden" name="form_type" value="contact_us">
+              <div class="col-md-12">
+                <button type="submit" value="submit" name="submit" class="btn-contact-submit mt-2">
+                  <i class="bi bi-send-fill"></i> Submit
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    @if($contactPage->resolvedMapEmbedUrl())
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="contact-map-card">
+          <iframe src="{{ $contactPage->resolvedMapEmbedUrl() }}" height="420" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </div>
+    @endif
+
+  </div>
 </div>
 
 <script>
-    // contact_form=document.getElementById('contact_form');
-    // contact_form.onsubmit=function(e){
-    //     e.preventDefault();
-    //     let formdata=new FormData(contact_form);
-    //     fetch("{{route('submit_contact_form')}}",{
-    //         headers:{
-    //             'X-CSRF-TOKEN':'{{csrf_token()}}'
-    //         },
-    //         method:"POST",
-    //         body:formdata
-    //     }).then(response=>response.json()).then(data=>{
-    //         sweatalert("Success","Your message has been sent successfully! We will get back to you soon.","success");
-    //         contact_form.reset();
-    //     }).catch(error=>{
-    //         sweatalert("An error occurred. Please try again later.","error");
-    //     });
-    // }
-
      $('#contact_form').submit((event)=>{
-        
+
             event.preventDefault();
             let formData = new FormData($('#contact_form')[0]);
             $.ajax({
@@ -100,7 +226,6 @@
                         'Your query has been submitted successfully. We will get back to you soon.',
                         'success'
                     )
-                    // $('#enquire-now').modal('hide');
                 },
                 error: function(error){
                     Swal.fire(

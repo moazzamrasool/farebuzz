@@ -21,25 +21,11 @@
   @error('body') <span class="text-danger">{{ $message }}</span> @enderror
 </div>
 
-<hr>
-<h6>SEO Meta</h6>
-<div class="form-group">
-  <label for="meta_title">Meta Title</label>
-  <input type="text" name="meta_title" id="meta_title" class="form-control @error('meta_title') is-invalid @enderror"
-    value="{{ old('meta_title', $cmsPage->meta_title ?? '') }}">
-  @error('meta_title') <span class="text-danger">{{ $message }}</span> @enderror
-</div>
-<div class="form-group">
-  <label for="meta_description">Meta Description</label>
-  <textarea name="meta_description" id="meta_description" rows="2" class="form-control @error('meta_description') is-invalid @enderror">{{ old('meta_description', $cmsPage->meta_description ?? '') }}</textarea>
-  @error('meta_description') <span class="text-danger">{{ $message }}</span> @enderror
-</div>
-<div class="form-group">
-  <label for="meta_keywords">Meta Keywords</label>
-  <input type="text" name="meta_keywords" id="meta_keywords" class="form-control @error('meta_keywords') is-invalid @enderror"
-    value="{{ old('meta_keywords', $cmsPage->meta_keywords ?? '') }}" placeholder="comma, separated, keywords">
-  @error('meta_keywords') <span class="text-danger">{{ $message }}</span> @enderror
-</div>
+@include('admin.partials._seo_fields', [
+  'seo' => $cmsPage ?? null,
+  'seoUrl' => isset($cmsPage) && $cmsPage->slug ? url($cmsPage->slug) : null,
+  'seoPreviewFallback' => ($cmsPage->title ?? 'Page').' – FareBuzzer',
+])
 
 <div class="form-group">
   <label for="status">Status</label>

@@ -13,6 +13,8 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ComingSoonController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CrmController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DestinationController;
@@ -38,8 +40,10 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 Route::get('/robots.txt',  [RobotsController::class, 'index'])->name('robots');
 Route::post('/submit-query', [DashboardController::class, 'submitQuery'])->name('submitquery');
 Route::get('/get-cities/{state}', [DashboardController::class, 'getCities'])->name('getcities');
-Route::get('/about-us',    [AboutController::class, 'show'])->name('about-us');
-Route::get('/contact-us',  fn () => view('contact_us'))->name('contact_us');
+// Rich About Page module (Hero/Story/Team/Stats/etc., edited at /crm/about-page).
+Route::get('/about-us', [AboutController::class, 'show'])->name('about-us');
+Route::get('/contact-us',  [ContactController::class, 'show'])->name('contact_us');
+Route::get('/coming-soon/{product}', [ComingSoonController::class, 'show'])->name('coming.soon');
 Route::post('/submit-contact-form', [DashboardController::class, 'submitContactForm'])->name('submit_contact_form');
 
 // CRM product landing page — business enquiries (not the /crm admin panel, see routes/admin.php)

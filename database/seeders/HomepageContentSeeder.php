@@ -121,7 +121,7 @@ class HomepageContentSeeder extends Seeder
             'hero',
             'Hero / Banner',
             'Your Journey Starts with FareBuzzer',
-            'Flights · Hotels · Trains · Buses · Cabs & More — All in One Place',
+            'Flights · Hotels · Holiday · Buses · Cabs & More — All in One Place',
             0
         );
 
@@ -337,12 +337,13 @@ class HomepageContentSeeder extends Seeder
             ['group_key' => 'company', 'title' => 'News & Blog', 'link' => 'news-blog'],
             ['group_key' => 'company', 'title' => 'Investor Relations', 'link' => 'investor-relations'],
             ['group_key' => 'company', 'title' => 'Partner with us', 'link' => 'partner-with-us'],
-            // Products
-            ['group_key' => 'products', 'title' => 'Flights', 'link' => '#'],
-            ['group_key' => 'products', 'title' => 'Hotels', 'link' => '#'],
+            // Products — Flights/Trains/Buses & Cabs aren't live yet, so they point at
+            // /coming-soon instead of '#' (dead links were flagged as a P1 in the Ads audit).
+            ['group_key' => 'products', 'title' => 'Flights', 'link' => 'coming-soon/flights'],
+            ['group_key' => 'products', 'title' => 'Hotels', 'link' => 'hotels'],
             ['group_key' => 'products', 'title' => 'Holiday Packages', 'link' => 'holiday-packages'],
-            ['group_key' => 'products', 'title' => 'Trains', 'link' => '#'],
-            ['group_key' => 'products', 'title' => 'Buses & Cabs', 'link' => '#'],
+            ['group_key' => 'products', 'title' => 'Trains', 'link' => 'coming-soon/trains'],
+            ['group_key' => 'products', 'title' => 'Buses & Cabs', 'link' => 'coming-soon/buses-cabs'],
             // Support
             ['group_key' => 'support', 'title' => 'Help Center', 'link' => 'help-center'],
             ['group_key' => 'support', 'title' => 'My Trips', 'link' => '#'],

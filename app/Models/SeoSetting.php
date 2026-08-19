@@ -18,6 +18,7 @@ class SeoSetting extends Model
         'hotels'           => ['included' => true, 'priority' => '0.7', 'changefreq' => 'weekly'],
         'activities'       => ['included' => true, 'priority' => '0.6', 'changefreq' => 'weekly'],
         'destinations'     => ['included' => true, 'priority' => '0.7', 'changefreq' => 'weekly'],
+        'destination_packages' => ['included' => true, 'priority' => '0.6', 'changefreq' => 'weekly'],
         'cms_pages'        => ['included' => true, 'priority' => '0.5', 'changefreq' => 'monthly'],
         'blog'             => ['included' => true, 'priority' => '0.5', 'changefreq' => 'monthly'],
     ];
@@ -28,6 +29,10 @@ class SeoSetting extends Model
         'sitemap_config',
         'sitemap_generated_at',
         'sitemap_url_count',
+        'default_og_image',
+        'organization_name',
+        'organization_logo',
+        'social_links',
     ];
 
     protected function casts(): array
@@ -36,6 +41,7 @@ class SeoSetting extends Model
             'sitemap_config'        => 'array',
             'sitemap_generated_at'  => 'datetime',
             'sitemap_url_count'     => 'integer',
+            'social_links'          => 'array',
         ];
     }
 

@@ -32,6 +32,13 @@ class HolidayPackage extends Model
         'meta_description',
         'meta_keywords',
         'focus_keyword',
+        'tags',
+        'canonical_url',
+        'og_title',
+        'og_description',
+        'og_image',
+        'robots_index',
+        'robots_follow',
         'price',
         'discounted_price',
         'booking_type',
@@ -46,6 +53,8 @@ class HolidayPackage extends Model
         return [
             'featured'       => 'boolean',
             'is_best_seller' => 'boolean',
+            'robots_index'   => 'boolean',
+            'robots_follow'  => 'boolean',
         ];
     }
 

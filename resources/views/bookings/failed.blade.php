@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Payment Failed – FareBuzzer')
+@section('robots', 'noindex, follow')
 
 @push('styles')
 <style>

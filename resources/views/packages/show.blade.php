@@ -1,17 +1,15 @@
 @extends('layouts.app')
 
-@section('title', $package->meta_title ?: $package->title.' – Holiday Package – FareBuzzer')
-@section('meta_description', $package->meta_description ?: Str::limit(strip_tags($package->overview), 160))
-@if($package->meta_keywords)
-  @section('meta_keywords', $package->meta_keywords)
-@endif
-@section('og_title', $package->meta_title ?: $package->title)
-@section('og_description', $package->meta_description ?: Str::limit(strip_tags($package->overview), 160))
-@if($package->photos->first())
-  @section('og_image', \App\Support\MediaUrl::resolve($package->photos->first()->path))
-@endif
-@section('og_url', route('packages.show', $package->slug))
-@section('canonical', route('packages.show', $package->slug))
+@php
+  $seo = \App\Support\Seo\SeoResolver::resolve(
+    $package,
+    $package->title.' – Holiday Package – FareBuzzer',
+    $package->overview,
+    $package->photos->first()?->path,
+    route('packages.show', $package->slug),
+  );
+@endphp
+@include('partials._seo_head', ['seo' => $seo])
 
 @if($package->faqs->isNotEmpty())
   @push('jsonld')
@@ -577,6 +575,17 @@
       e.preventDefault();
       var target = document.querySelector(this.getAttribute('href'));
       if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Native date inputs only reliably open the calendar when the small icon itself is
+  // clicked — clicking the blank rest of the field does nothing in some Chromium builds.
+  // Open it on any click so the whole field is a click target, not just the icon.
+  document.querySelectorAll('input[type="date"]').forEach(function (input) {
+    input.addEventListener('click', function () {
+      if (typeof this.showPicker === 'function') {
+        try { this.showPicker(); } catch (e) {}
+      }
     });
   });
 

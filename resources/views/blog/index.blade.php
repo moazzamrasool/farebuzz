@@ -1,7 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Travel Blog – Tips, Guides & Destination Inspiration | FareBuzzer')
-@section('meta_description', 'Travel tips, destination guides, offers and inspiration from the FareBuzzer travel blog.')
+@php
+  $seo = \App\Support\Seo\SeoResolver::resolve(
+    null,
+    'Travel Blog – Tips, Guides & Destination Inspiration | FareBuzzer',
+    'Travel tips, destination guides, offers and inspiration from the FareBuzzer travel blog.',
+    null,
+    \App\Support\Seo\CanonicalUrl::forListing(),
+  );
+@endphp
+@include('partials._seo_head', ['seo' => $seo])
 
 @push('styles')
 <style>

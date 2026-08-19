@@ -1,6 +1,15 @@
 @extends('layouts.app')
 
-@section('title', $hotel->name.' – FareBuzzer')
+@php
+  $seo = \App\Support\Seo\SeoResolver::resolve(
+    $hotel,
+    $hotel->name.' – FareBuzzer',
+    $hotel->description,
+    $hotel->cover_image,
+    route('hotels.show', $hotel->slug),
+  );
+@endphp
+@include('partials._seo_head', ['seo' => $seo])
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('frontend/asset/css/package-card.css') }}">

@@ -8,6 +8,8 @@ use App\Http\Requests\Admin\SitemapConfigRequest;
 use App\Models\SeoSetting;
 use App\Services\Seo\RobotsTxtBuilder;
 use App\Services\Seo\SitemapGenerator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SeoSettingController extends Controller
 {
@@ -56,6 +58,48 @@ class SeoSettingController extends Controller
         return redirect()
             ->route('crm.seo-settings.edit')
             ->with('success', 'Sitemap settings updated and regenerated.');
+    }
+
+    public function updateDefaults(Request $request)
+    {
+        $setting = SeoSetting::forCurrentTenant();
+
+        $data = $request->validate([
+            'organization_name' => 'nullable|string|max:255',
+            'organization_logo' => 'nullable|image|max:2048',
+            'default_og_image'  => 'nullable|image|max:2048',
+            'social_links.facebook'  => 'nullable|url|max:255',
+            'social_links.instagram' => 'nullable|url|max:255',
+            'social_links.twitter'   => 'nullable|url|max:255',
+            'social_links.youtube'   => 'nullable|url|max:255',
+            'social_links.linkedin'  => 'nullable|url|max:255',
+        ]);
+
+        if ($request->hasFile('organization_logo')) {
+            if ($setting->organization_logo) {
+                Storage::disk('public')->delete($setting->organization_logo);
+            }
+            $data['organization_logo'] = $request->file('organization_logo')->store('seo', 'public');
+        } else {
+            unset($data['organization_logo']);
+        }
+
+        if ($request->hasFile('default_og_image')) {
+            if ($setting->default_og_image) {
+                Storage::disk('public')->delete($setting->default_og_image);
+            }
+            $data['default_og_image'] = $request->file('default_og_image')->store('seo', 'public');
+        } else {
+            unset($data['default_og_image']);
+        }
+
+        $data['social_links'] = array_filter($data['social_links'] ?? []);
+
+        $setting->update($data);
+
+        return redirect()
+            ->route('crm.seo-settings.edit')
+            ->with('success', 'Site-wide SEO defaults updated.');
     }
 
     public function regenerateSitemap(SitemapGenerator $sitemap)

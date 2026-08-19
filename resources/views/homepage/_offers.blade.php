@@ -37,13 +37,11 @@
               <div class="offer-accent-line"></div>
               <p class="offer-desc">{{ $item->description }}</p>
               @if($item->coupon)
-                <div class="offer-coupon-code" style="border:1px dashed #0084ff;border-radius:4px;padding:4px 10px;display:inline-block;font-weight:700;font-size:12px;color:#0084ff;margin-bottom:8px;">
-                  CODE: {{ $item->coupon->code }}
-                </div>
+                <button type="button" class="offer-coupon-code" data-copy-code="{{ $item->coupon->code }}"
+                  style="border:1px dashed #0084ff;border-radius:4px;padding:4px 10px;display:inline-block;font-weight:700;font-size:12px;color:#0084ff;margin-bottom:8px;background:#fff;cursor:pointer;">
+                  <span class="offer-coupon-code-text">CODE: {{ $item->coupon->code }}</span>
+                </button>
               @endif
-            </div>
-            <div class="offer-footer-row">
-              <a href="{{ \App\Support\MediaUrl::link($item->link ?? $item->coupon?->banner_link) }}" class="btn-offer">{{ $item->button_label ?? 'VIEW DETAILS' }}</a>
             </div>
           </div>
         </div>

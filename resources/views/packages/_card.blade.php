@@ -85,6 +85,13 @@
   </div>
   <div class="pkg-card-footer">
     <a href="{{ route('packages.show', $package->slug) }}" class="btn-view">VIEW DETAILS</a>
-    <a href="{{ route('packages.show', $package->slug) }}" class="btn-book-now">BOOK NOW</a>
+    <div class="d-flex align-items-center gap-2">
+      @if(config('app.contact_phone'))
+        <a href="tel:{{ config('app.contact_phone') }}" class="btn-call" title="Call us" aria-label="Call us">
+          <i class="bi bi-telephone-fill"></i>
+        </a>
+      @endif
+      <a href="{{ route('packages.show', $package->slug) }}" class="btn-book-now">BOOK NOW</a>
+    </div>
   </div>
 </div>

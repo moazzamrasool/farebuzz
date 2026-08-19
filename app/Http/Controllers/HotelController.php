@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Amenity;
 use App\Models\Destination;
 use App\Models\Hotel;
+use App\Models\ListingPageSeo;
 use App\Support\SiteTenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -24,10 +25,12 @@ class HotelController extends Controller
             || $request->filled('price_min') || $request->filled('price_max') || $request->filled('rating_min')
             || $request->filled('property_type');
 
-        return $isSearch ? $this->results($request) : $this->landing($request);
+        $pageSeo = ListingPageSeo::forSitePage('hotels');
+
+        return $isSearch ? $this->results($request, $pageSeo) : $this->landing($request, $pageSeo);
     }
 
-    private function landing(Request $request)
+    private function landing(Request $request, ?ListingPageSeo $pageSeo = null)
     {
         $destinations = Destination::forSite()->where('status', 'active')
             ->whereHas('hotels', fn ($q) => $q->where('status', 'active'))
@@ -45,10 +48,10 @@ class HotelController extends Controller
             ->limit(4)
             ->get();
 
-        return view('hotels.landing', compact('destinations', 'featuredDestination', 'stayHotels'));
+        return view('hotels.landing', compact('destinations', 'featuredDestination', 'stayHotels', 'pageSeo'));
     }
 
-    private function results(Request $request)
+    private function results(Request $request, ?ListingPageSeo $pageSeo = null)
     {
         $query = Hotel::forSite()->where('status', 'active')->with('amenities', 'roomTypes', 'destination');
 
@@ -103,7 +106,7 @@ class HotelController extends Controller
         $adults = max(1, (int) $request->get('adults', $this->guestsFromRoomsParam($request)));
         $rooms = max(1, (int) $request->get('rooms_count', $this->roomsFromRoomsParam($request)));
 
-        return view('hotels.index', compact('hotels', 'amenities', 'destinations', 'checkIn', 'checkOut', 'nights', 'adults', 'rooms'));
+        return view('hotels.index', compact('hotels', 'amenities', 'destinations', 'checkIn', 'checkOut', 'nights', 'adults', 'rooms', 'pageSeo'));
     }
 
     public function show(Request $request, Hotel $hotel)

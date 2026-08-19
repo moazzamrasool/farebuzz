@@ -99,6 +99,13 @@ class BlogController extends Controller
             'meta_keywords'     => 'nullable|string|max:255',
             'og_image'          => 'nullable|image|max:2048',
             'canonical_url'     => 'nullable|url|max:255',
+            'focus_keyword'     => 'nullable|string|max:255',
+            'tags'              => 'nullable|string|max:255',
+            'og_title'          => 'nullable|string|max:255',
+            'og_description'    => 'nullable|string|max:500',
+            'robots_index'      => 'nullable|boolean',
+            'robots_follow'     => 'nullable|boolean',
+            'reading_time'      => 'nullable|integer|min:1|max:120',
         ]);
     }
 
@@ -107,6 +114,8 @@ class BlogController extends Controller
         $data = $this->validated($request, $blog);
 
         $data['is_featured'] = $request->boolean('is_featured');
+        $data['robots_index'] = $request->boolean('robots_index');
+        $data['robots_follow'] = $request->boolean('robots_follow');
 
         if (!empty($data['content'])) {
             $data['content'] = HtmlSanitizer::clean($data['content']);

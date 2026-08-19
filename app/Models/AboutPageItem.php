@@ -21,7 +21,6 @@ class AboutPageItem extends Model
         'testimonial' => 'Testimonial',
         'press' => 'Press Logo',
         'award' => 'Award',
-        'trust_badge' => 'Trust Badge',
     ];
 
     protected $fillable = [

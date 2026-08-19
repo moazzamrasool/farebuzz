@@ -61,6 +61,13 @@ class HolidayPackageRequest extends FormRequest
             'meta_keywords'    => 'nullable|string|max:255',
             'focus_keyword'    => 'nullable|string|max:255',
             'seo_content'      => 'nullable|string',
+            'tags'             => 'nullable|string|max:255',
+            'canonical_url'    => 'nullable|url|max:255',
+            'og_title'         => 'nullable|string|max:255',
+            'og_description'   => 'nullable|string|max:500',
+            'og_image'         => 'nullable|image|max:2048',
+            'robots_index'     => 'nullable|boolean',
+            'robots_follow'    => 'nullable|boolean',
 
             // Inclusions / Exclusions
             'inclusion_feature_ids'   => 'nullable|array',

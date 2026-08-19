@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Book '.$package->title.' – FareBuzzer')
+@section('robots', 'noindex, follow')
 
 @push('styles')
 <style>

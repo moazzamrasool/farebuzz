@@ -70,6 +70,7 @@
                           'hotels' => 'Hotels',
                           'activities' => 'Activities',
                           'destinations' => 'Destinations',
+                          'destination_packages' => 'Destination Package Listings',
                           'cms_pages' => 'CMS Pages',
                           'blog' => 'Blog Posts',
                         ];
@@ -97,6 +98,61 @@
                     </tbody>
                   </table>
                   <button type="submit" class="btn btn-primary">Save Sitemap Settings</button>
+                </form>
+              </div>
+            </div>
+
+            {{-- ── Site-wide SEO defaults ─────────────────────────────────── --}}
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Site-wide SEO Defaults</h3>
+              </div>
+              <div class="card-body">
+                <p class="text-muted">Used as the last-resort fallback when a page has no OG image of its own, and to fill in the Organization details search engines show for the whole site.</p>
+
+                <form action="{{ route('crm.seo-settings.defaults.update') }}" method="POST" enctype="multipart/form-data">
+                  @csrf
+                  @method('PUT')
+
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label for="organization_name">Organization Name</label>
+                      <input type="text" name="organization_name" id="organization_name" class="form-control @error('organization_name') is-invalid @enderror"
+                        value="{{ old('organization_name', $setting->organization_name) }}" placeholder="e.g. FareBuzzer Travel">
+                      @error('organization_name') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label for="organization_logo">Organization Logo</label>
+                      <input type="file" name="organization_logo" id="organization_logo" class="form-control-file @error('organization_logo') is-invalid @enderror" accept="image/*">
+                      @error('organization_logo') <span class="text-danger d-block">{{ $message }}</span> @enderror
+                      @if($setting->organization_logo)
+                        <div class="mt-2"><img src="{{ asset('storage/'.$setting->organization_logo) }}" style="height:50px;object-fit:contain;"></div>
+                      @endif
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="default_og_image">Default OG Image <small class="text-muted">(1200×630 — used when a page and its content type both have none)</small></label>
+                    <input type="file" name="default_og_image" id="default_og_image" class="form-control-file @error('default_og_image') is-invalid @enderror" accept="image/*">
+                    @error('default_og_image') <span class="text-danger d-block">{{ $message }}</span> @enderror
+                    @if($setting->default_og_image)
+                      <div class="mt-2"><img src="{{ asset('storage/'.$setting->default_og_image) }}" style="width:120px;height:70px;object-fit:cover;border-radius:6px;"></div>
+                    @endif
+                  </div>
+
+                  <label class="d-block">Social Links <small class="text-muted">(used in Organization structured data)</small></label>
+                  <div class="form-row">
+                    @foreach(['facebook' => 'Facebook', 'instagram' => 'Instagram', 'twitter' => 'Twitter / X', 'youtube' => 'YouTube', 'linkedin' => 'LinkedIn'] as $key => $label)
+                      <div class="form-group col-md-4">
+                        <label for="social_{{ $key }}">{{ $label }}</label>
+                        <input type="url" name="social_links[{{ $key }}]" id="social_{{ $key }}" class="form-control @error('social_links.'.$key) is-invalid @enderror"
+                          value="{{ old('social_links.'.$key, $setting->social_links[$key] ?? '') }}" placeholder="https://...">
+                        @error('social_links.'.$key) <span class="text-danger">{{ $message }}</span> @enderror
+                      </div>
+                    @endforeach
+                  </div>
+
+                  <button type="submit" class="btn btn-primary">Save Defaults</button>
                 </form>
               </div>
             </div>

@@ -11,7 +11,7 @@
                 <h3 class="card-title">Add Page</h3>
               </div>
               <div class="card-body">
-                <form action="{{ route('crm.cms-pages.store') }}" method="POST">
+                <form action="{{ route('crm.cms-pages.store') }}" method="POST" enctype="multipart/form-data">
                   @include('admin.cms-pages._form')
                 </form>
               </div>

@@ -177,9 +177,18 @@ class DestinationController extends Controller
     private function prepareData(DestinationRequest $request, ?Destination $destination = null): array
     {
         $data = $request->validated();
-        unset($data['cover_image'], $data['gallery_images']);
+        unset($data['cover_image'], $data['gallery_images'], $data['og_image']);
 
         $data['featured'] = $request->boolean('featured');
+        $data['robots_index'] = $request->boolean('robots_index');
+        $data['robots_follow'] = $request->boolean('robots_follow');
+
+        if ($request->hasFile('og_image')) {
+            if ($destination?->og_image) {
+                Storage::disk('public')->delete($destination->og_image);
+            }
+            $data['og_image'] = $request->file('og_image')->store('destinations/og', 'public');
+        }
 
         if ($request->hasFile('cover_image')) {
             if ($destination?->cover_image) {

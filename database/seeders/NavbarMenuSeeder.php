@@ -20,6 +20,8 @@ class NavbarMenuSeeder extends Seeder
             ['label' => 'Activities',              'link_value' => 'activities.index'],
             ['label' => 'Mice',                    'link_value' => 'packages.mice'],
             ['label' => 'Blog',                    'link_value' => 'blog.index'],
+            ['label' => 'About Us',                'link_value' => 'about-us'],
+            ['label' => 'Contact Us',               'link_value' => 'contact_us'],
         ] as $index => $item) {
             NavbarMenuItem::updateOrCreate(
                 ['link_type' => 'route', 'link_value' => $item['link_value']],

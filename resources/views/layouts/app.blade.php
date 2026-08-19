@@ -11,6 +11,8 @@
 <!-- ══════════ FOOTER ══════════ -->
 
 @include('layouts.footer')
+@include('layouts.partials.floating_buttons')
+@include('layouts.partials.tawkto')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{asset('frontend/asset/js/custom.js')}}"></script>
 <script src="{{asset('frontend/asset/js/autocomplete.js')}}"></script>

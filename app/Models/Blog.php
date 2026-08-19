@@ -34,6 +34,13 @@ class Blog extends Model
         'meta_keywords',
         'og_image',
         'canonical_url',
+        'focus_keyword',
+        'tags',
+        'og_title',
+        'og_description',
+        'robots_index',
+        'robots_follow',
+        'reading_time',
     ];
 
     protected function casts(): array
@@ -41,6 +48,8 @@ class Blog extends Model
         return [
             'is_featured'  => 'boolean',
             'published_at' => 'datetime',
+            'robots_index'  => 'boolean',
+            'robots_follow' => 'boolean',
         ];
     }
 
@@ -49,8 +58,14 @@ class Blog extends Model
         return $query->where('status', 'published')->where('published_at', '<=', now());
     }
 
+    // Admin-entered reading_time wins when set; otherwise estimated from word count
+    // at 200 wpm, same as before this column existed.
     public function getReadTimeAttribute(): string
     {
+        if ($this->reading_time) {
+            return $this->reading_time.' min read';
+        }
+
         $words = str_word_count(strip_tags((string) $this->content));
         $minutes = max(1, (int) ceil($words / 200));
 

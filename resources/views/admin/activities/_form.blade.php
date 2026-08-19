@@ -93,5 +93,11 @@
   </div>
 </div>
 
+@include('admin.partials._seo_fields', [
+  'seo' => $activity ?? null,
+  'seoUrl' => isset($activity) && $activity->slug ? route('activities.show', $activity->slug) : null,
+  'seoPreviewFallback' => ($activity->name ?? 'Activity').' – FareBuzzer',
+])
+
 <button type="submit" class="btn btn-primary">{{ isset($activity) ? 'Update' : 'Create' }} Activity</button>
 <a href="{{ route('crm.activities.index') }}" class="btn btn-secondary">Cancel</a>

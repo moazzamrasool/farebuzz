@@ -1,7 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'All Destinations – FareBuzzer')
-@section('meta_description', 'Browse every India and international destination FareBuzzer covers — packages, hotels and activities in one place.')
+@php
+  $seo = \App\Support\Seo\SeoResolver::resolve(
+    null,
+    'All Destinations – FareBuzzer',
+    'Browse every India and international destination FareBuzzer covers — packages, hotels and activities in one place.',
+    null,
+    \App\Support\Seo\CanonicalUrl::forListing(),
+  );
+@endphp
+@include('partials._seo_head', ['seo' => $seo])
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('frontend/asset/css/destination-tiles.css') }}">

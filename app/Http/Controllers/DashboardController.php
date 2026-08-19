@@ -19,8 +19,9 @@ class DashboardController extends Controller
         $states = DB::table('states')->get();
         $sections = HomepageSection::forSite()->active()->orderBy('sort_order')->get();
         $searchTabs = SearchTabSetting::forSite()->ordered()->get();
+        $homepageSeo = \App\Models\HomepageSeo::forSite()->first();
 
-        return view('welcome', compact('states', 'sections', 'searchTabs'));
+        return view('welcome', compact('states', 'sections', 'searchTabs', 'homepageSeo'));
     }
 
     // AJAX — cities by state

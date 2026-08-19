@@ -34,12 +34,25 @@ class Hotel extends Model
         'gallery_images',
         'status',
         'sort_order',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
+        'focus_keyword',
+        'tags',
+        'canonical_url',
+        'og_title',
+        'og_description',
+        'og_image',
+        'robots_index',
+        'robots_follow',
     ];
 
     protected function casts(): array
     {
         return [
             'gallery_images' => 'array',
+            'robots_index'   => 'boolean',
+            'robots_follow'  => 'boolean',
         ];
     }
 

@@ -3,6 +3,13 @@
   $footerItems = $footerSection ? $footerSection->activeItems() : collect();
   $footerExtra = $footerSection->extra ?? [];
   $footerGroup = fn (string $key) => $footerItems->where('group_key', $key);
+  $hasUrl = fn (?string $url) => $url && $url !== '#';
+  $socials = [
+    ['icon' => 'bi-facebook',   'url' => $footerExtra['social_facebook'] ?? null],
+    ['icon' => 'bi-twitter-x',  'url' => $footerExtra['social_twitter'] ?? null],
+    ['icon' => 'bi-instagram',  'url' => $footerExtra['social_instagram'] ?? null],
+    ['icon' => 'bi-youtube',    'url' => $footerExtra['social_youtube'] ?? null],
+  ];
 @endphp
 <footer class="site-footer py-5">
   <div class="container">
@@ -10,12 +17,15 @@
       <div class="col-12 col-md-3">
         <div class="footer-logo mb-2"><img src="{{ asset('frontend/img/logo.png') }}" alt="FareBuzzer"></div>
         <p style="font-size:12px;color:#aaa;line-height:1.6;">{{ $footerExtra['blurb'] ?? '' }}</p>
+        @if(collect($socials)->contains(fn ($s) => $hasUrl($s['url'])))
         <div class="d-flex gap-3 mt-3">
-          <a href="{{ $footerExtra['social_facebook'] ?? '#' }}" style="color:#aaa;font-size:18px;"><i class="bi bi-facebook"></i></a>
-          <a href="{{ $footerExtra['social_twitter'] ?? '#' }}" style="color:#aaa;font-size:18px;"><i class="bi bi-twitter-x"></i></a>
-          <a href="{{ $footerExtra['social_instagram'] ?? '#' }}" style="color:#aaa;font-size:18px;"><i class="bi bi-instagram"></i></a>
-          <a href="{{ $footerExtra['social_youtube'] ?? '#' }}" style="color:#aaa;font-size:18px;"><i class="bi bi-youtube"></i></a>
+          @foreach($socials as $s)
+            @if($hasUrl($s['url']))
+              <a href="{{ $s['url'] }}" target="_blank" rel="noopener noreferrer" style="color:#aaa;font-size:18px;"><i class="bi {{ $s['icon'] }}"></i></a>
+            @endif
+          @endforeach
         </div>
+        @endif
       </div>
       <div class="col-6 col-md-2 footer-links">
         <h6>Company</h6>
@@ -45,11 +55,18 @@
         <h6>Download App</h6>
         <p style="font-size:12px;color:#aaa;margin-bottom:10px;">Get the best deals on the go</p>
         @foreach($footerGroup('download_app') as $link)
-          @php $icon = $link->meta['icon'] ?? 'apple'; @endphp
-          <a href="{{ $link->link ?? '#' }}" class="d-flex align-items-center gap-2 bg-dark text-white rounded p-2 mb-2 text-decoration-none" style="font-size:12px;max-width:160px;">
-            <i class="bi bi-{{ $icon }}" style="font-size:20px;"></i>
-            <div><div style="font-size:9px;opacity:.7;">{{ $icon === 'apple' ? 'Download on the' : 'Get it on' }}</div><div style="font-weight:700;">{{ $link->title }}</div></div>
-          </a>
+          @php $icon = $link->meta['icon'] ?? 'apple'; $live = $hasUrl($link->link); @endphp
+          @if($live)
+            <a href="{{ $link->link }}" target="_blank" rel="noopener noreferrer" class="d-flex align-items-center gap-2 bg-dark text-white rounded p-2 mb-2 text-decoration-none" style="font-size:12px;max-width:160px;">
+              <i class="bi bi-{{ $icon }}" style="font-size:20px;"></i>
+              <div><div style="font-size:9px;opacity:.7;">{{ $icon === 'apple' ? 'Download on the' : 'Get it on' }}</div><div style="font-weight:700;">{{ $link->title }}</div></div>
+            </a>
+          @else
+            <span class="d-flex align-items-center gap-2 bg-dark text-white rounded p-2 mb-2" style="font-size:12px;max-width:160px;opacity:.45;cursor:not-allowed;" aria-disabled="true" title="Coming soon">
+              <i class="bi bi-{{ $icon }}" style="font-size:20px;"></i>
+              <div><div style="font-size:9px;opacity:.7;">{{ $icon === 'apple' ? 'Coming soon on the' : 'Coming soon on' }}</div><div style="font-weight:700;">{{ $link->title }}</div></div>
+            </span>
+          @endif
         @endforeach
       </div>
     </div>

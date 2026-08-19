@@ -55,6 +55,18 @@ class AboutPageController extends Controller
             }
         }
 
+        if ($request->hasFile('og_image')) {
+            if ($about->og_image) {
+                Storage::disk('public')->delete($about->og_image);
+            }
+            $data['og_image'] = $request->file('og_image')->store('about/og', 'public');
+        } else {
+            unset($data['og_image']);
+        }
+
+        $data['robots_index'] = $request->boolean('robots_index');
+        $data['robots_follow'] = $request->boolean('robots_follow');
+
         $about->fill($data)->save();
 
         foreach (array_keys(AboutPageItem::SECTIONS) as $key) {
@@ -124,9 +136,6 @@ class AboutPageController extends Controller
             'hero_tagline' => 'nullable|string|max:255',
             'hero_image' => 'nullable|image|max:2048',
 
-            'scale_heading' => 'nullable|string|max:255',
-            'scale_subheading' => 'nullable|string|max:255',
-
             'story_heading' => 'nullable|string|max:255',
             'story_body' => 'nullable|string',
             'story_image' => 'nullable|image|max:2048',
@@ -134,7 +143,6 @@ class AboutPageController extends Controller
             'mission_heading' => 'nullable|string|max:255',
             'mission_body' => 'nullable|string',
             'mission_image' => 'nullable|image|max:2048',
-            'founded_year' => 'nullable|integer|min:1900|max:'.now()->year,
 
             'team_heading' => 'nullable|string|max:255',
             'team_subheading' => 'nullable|string|max:255',
@@ -160,30 +168,18 @@ class AboutPageController extends Controller
 
             'awards_heading' => 'nullable|string|max:255',
 
-            'cta_heading' => 'nullable|string|max:255',
-            'cta_text' => 'nullable|string|max:255',
-            'cta_button_text' => 'nullable|string|max:255',
-            'cta_button_link' => 'nullable|string|max:255',
-
-            'cta2_heading' => 'nullable|string|max:255',
-            'cta2_text' => 'nullable|string|max:255',
-            'cta2_button_text' => 'nullable|string|max:255',
-            'cta2_button_link' => 'nullable|string|max:255',
-
-            'career_heading' => 'nullable|string|max:255',
-            'career_text' => 'nullable|string|max:255',
-            'career_button_text' => 'nullable|string|max:255',
-            'career_button_link' => 'nullable|string|max:255',
-
             'meta_title' => 'nullable|string|max:255',
-            'meta_description' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keywords' => 'nullable|string|max:255',
+            'focus_keyword' => 'nullable|string|max:255',
+            'tags' => 'nullable|string|max:255',
+            'canonical_url' => 'nullable|url|max:255',
+            'og_title' => 'nullable|string|max:255',
+            'og_description' => 'nullable|string|max:500',
+            'og_image' => 'nullable|image|max:2048',
+            'robots_index' => 'nullable|boolean',
+            'robots_follow' => 'nullable|boolean',
         ];
-
-        for ($i = 1; $i <= 4; $i++) {
-            $rules["stat{$i}_label"] = 'nullable|string|max:255';
-            $rules["stat{$i}_value"] = 'nullable|string|max:255';
-            $rules["stat{$i}_source"] = 'nullable|in:'.implode(',', array_keys(AboutPage::STAT_SOURCES));
-        }
 
         for ($i = 1; $i <= 3; $i++) {
             $rules["feature{$i}_icon"] = 'nullable|string|max:255';

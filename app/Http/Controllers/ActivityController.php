@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Activity;
 use App\Models\Destination;
+use App\Models\ListingPageSeo;
 use Illuminate\Http\Request;
 
 class ActivityController extends Controller
@@ -40,8 +41,9 @@ class ActivityController extends Controller
         $activities = $query->paginate(12)->withQueryString();
         $categories = Activity::forSite()->whereNotNull('category')->distinct()->orderBy('category')->pluck('category');
         $destinations = Destination::forSite()->where('status', 'active')->orderBy('name')->get();
+        $pageSeo = ListingPageSeo::forSitePage('activities');
 
-        return view('activities.index', compact('activities', 'categories', 'destinations'));
+        return view('activities.index', compact('activities', 'categories', 'destinations', 'pageSeo'));
     }
 
     public function show(Activity $activity)

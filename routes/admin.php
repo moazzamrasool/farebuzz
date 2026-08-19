@@ -10,6 +10,9 @@
 */
 
 use App\Http\Controllers\Admin\AboutPageController;
+use App\Http\Controllers\Admin\ContactPageController;
+use App\Http\Controllers\Admin\HomepageSeoController;
+use App\Http\Controllers\Admin\ListingPageSeoController;
 use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AmenityController;
@@ -241,6 +244,20 @@ Route::prefix('crm')->group(function () {
             Route::middleware('admin.permission:about-page.view')->get('about-page', [AboutPageController::class, 'edit'])->name('crm.about-page.edit');
             Route::middleware('admin.permission:about-page.edit')->put('about-page', [AboutPageController::class, 'update'])->name('crm.about-page.update');
 
+            Route::middleware('admin.permission:homepage-seo.view')->get('homepage-seo', [HomepageSeoController::class, 'edit'])->name('crm.homepage-seo.edit');
+            Route::middleware('admin.permission:homepage-seo.edit')->put('homepage-seo', [HomepageSeoController::class, 'update'])->name('crm.homepage-seo.update');
+
+            // Listing pages SEO — india-packages/international-packages/hotels/activities,
+            // one settings row per page_key (see ListingPageSeo::PAGES).
+            Route::middleware('admin.permission:listing-page-seo.view')->group(function () {
+                Route::get('listing-page-seo', [ListingPageSeoController::class, 'index'])->name('crm.listing-page-seo.index');
+                Route::get('listing-page-seo/{page}', [ListingPageSeoController::class, 'edit'])->where('page', 'india-packages|international-packages|hotels|activities')->name('crm.listing-page-seo.edit');
+            });
+            Route::middleware('admin.permission:listing-page-seo.edit')->put('listing-page-seo/{page}', [ListingPageSeoController::class, 'update'])->where('page', 'india-packages|international-packages|hotels|activities')->name('crm.listing-page-seo.update');
+
+            Route::middleware('admin.permission:contact-page.view')->get('contact-page', [ContactPageController::class, 'edit'])->name('crm.contact-page.edit');
+            Route::middleware('admin.permission:contact-page.edit')->put('contact-page', [ContactPageController::class, 'update'])->name('crm.contact-page.update');
+
             // WhatsApp Bot settings — company-owner-only (tier check inside the controller,
             // same treatment as AiPackageController::toggleSetting).
             Route::get('whatsapp-settings', [WhatsAppSettingController::class, 'edit'])->name('crm.whatsapp-settings.edit');
@@ -253,6 +270,7 @@ Route::prefix('crm')->group(function () {
                 Route::put('seo-settings/robots', [SeoSettingController::class, 'updateRobots'])->name('crm.seo-settings.robots.update');
                 Route::put('seo-settings/sitemap-config', [SeoSettingController::class, 'updateSitemapConfig'])->name('crm.seo-settings.sitemap-config.update');
                 Route::post('seo-settings/sitemap/regenerate', [SeoSettingController::class, 'regenerateSitemap'])->name('crm.seo-settings.sitemap.regenerate');
+                Route::put('seo-settings/defaults', [SeoSettingController::class, 'updateDefaults'])->name('crm.seo-settings.defaults.update');
             });
 
             // Tracking & Scripts (header/body/footer raw code injection) — company-owner-only,
@@ -264,6 +282,7 @@ Route::prefix('crm')->group(function () {
             Route::middleware('admin.permission:cms-pages.create')->group(function () {
                 Route::get('cms-pages/create', [CmsPageController::class, 'create'])->name('crm.cms-pages.create');
                 Route::post('cms-pages', [CmsPageController::class, 'store'])->name('crm.cms-pages.store');
+                Route::post('cms-pages/{cmsPage}/duplicate', [CmsPageController::class, 'duplicate'])->name('crm.cms-pages.duplicate');
             });
             Route::middleware('admin.permission:cms-pages.edit')->group(function () {
                 Route::get('cms-pages/{cmsPage}/edit', [CmsPageController::class, 'edit'])->name('crm.cms-pages.edit');

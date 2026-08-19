@@ -1,17 +1,15 @@
 @extends('layouts.app')
 
-@section('title', $blog->meta_title ?: $blog->title.' – FareBuzzer')
-@section('meta_description', $blog->meta_description ?: $blog->excerpt)
-@if($blog->meta_keywords)
-  @section('meta_keywords', $blog->meta_keywords)
-@endif
-@section('og_title', $blog->meta_title ?: $blog->title)
-@section('og_description', $blog->meta_description ?: $blog->excerpt)
-@if($blog->og_image || $blog->featured_image)
-  @section('og_image', asset('storage/'.($blog->og_image ?: $blog->featured_image)))
-@endif
-@section('og_url', $blog->canonical_url ?: url()->current())
-@section('canonical', $blog->canonical_url ?: url()->current())
+@php
+  $seo = \App\Support\Seo\SeoResolver::resolve(
+    $blog,
+    $blog->title.' – FareBuzzer',
+    $blog->excerpt ?: $blog->content,
+    $blog->featured_image,
+    route('blog.show', $blog->slug),
+  );
+@endphp
+@include('partials._seo_head', ['seo' => $seo])
 
 @push('styles')
 <style>

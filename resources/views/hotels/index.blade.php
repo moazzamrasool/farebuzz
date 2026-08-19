@@ -1,6 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Hotels – FareBuzzer')
+@php
+  $seo = \App\Support\Seo\SeoResolver::resolve(
+    $pageSeo ?? null,
+    'Hotels – FareBuzzer',
+    'Browse handpicked hotels across India and international destinations, from budget stays to luxury resorts.',
+    null,
+    \App\Support\Seo\CanonicalUrl::forListing(),
+  );
+@endphp
+@include('partials._seo_head', ['seo' => $seo])
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('frontend/asset/css/listing-filters.css') }}">

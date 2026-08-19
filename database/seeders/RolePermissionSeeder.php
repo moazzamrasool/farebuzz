@@ -15,6 +15,7 @@ class RolePermissionSeeder extends Seeder
         'holiday-packages', 'activities', 'users', 'roles', 'settings',
         'amenities', 'hotels', 'hotel-reviews', 'inclusions', 'exclusions',
         'homepage-sections', 'cms-pages', 'bookings', 'navbar-menu', 'blog', 'about-page', 'coupons',
+        'homepage-seo', 'listing-page-seo', 'contact-page',
         // Leads/CRM (package enquiries follow-up + WhatsApp/email + message templates)
         'leads',
         // Customers — public-facing signups, filtered to this company's bookings/enquiries

@@ -423,10 +423,21 @@
           { name: 'Wide letter spacing', element: 'span', classes: ['letter-wide'] }
         ]
       },
+      // The `cms-*` entries below are the design-block vocabulary used by the CMS page
+      // templates (hero/cards/callout/etc — see public/frontend/asset/css/style.css and
+      // resources/views/admin/cms-pages/_form.blade.php's "Insert template" picker).
+      // Without an explicit allow rule, GeneralHtmlSupport's schema strips any tag/class
+      // it doesn't recognise the moment content is loaded BACK into the editor — so a
+      // template pasted via Source, saved, then reopened would silently lose its markup
+      // on the very next save. `classes: true` accepts any class value on that tag so
+      // new cms- block types can be added to the CSS without touching this list.
       htmlSupport: {
         allow: [
           { name: 'p', classes: ['line-tight', 'line-loose'] },
-          { name: 'span', classes: ['letter-tight', 'letter-wide'] }
+          { name: 'span', classes: ['letter-tight', 'letter-wide'] },
+          { name: /^(div|section)$/, classes: true, styles: true, attributes: true },
+          { name: 'a', classes: true, styles: true, attributes: { href: true, target: true, rel: true } },
+          { name: /^(h[1-6]|ul|ol|li|table|thead|tbody|tr|th|td|figure|figcaption|small|strong|em|details|summary)$/, classes: true, styles: true }
         ]
       },
       // Posts straight to EditorUploadController::image() (routes/admin.php:

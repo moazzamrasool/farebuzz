@@ -1,6 +1,15 @@
 @extends('layouts.app')
 
-@section('title', $activity->name.' – FareBuzzer')
+@php
+  $seo = \App\Support\Seo\SeoResolver::resolve(
+    $activity,
+    $activity->name.' – FareBuzzer',
+    $activity->description,
+    $activity->image,
+    route('activities.show', $activity->slug),
+  );
+@endphp
+@include('partials._seo_head', ['seo' => $seo])
 
 @push('styles')
 <style>

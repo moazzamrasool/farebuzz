@@ -1,6 +1,15 @@
 @extends('layouts.app')
 
-@section('title', $heading.' – FareBuzzer')
+@php
+  $seo = \App\Support\Seo\SeoResolver::resolve(
+    $pageSeo ?? null,
+    $heading.' – FareBuzzer',
+    $subheading,
+    null,
+    \App\Support\Seo\CanonicalUrl::forListing(),
+  );
+@endphp
+@include('partials._seo_head', ['seo' => $seo])
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('frontend/asset/css/listing-filters.css') }}">

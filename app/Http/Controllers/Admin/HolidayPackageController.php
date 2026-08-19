@@ -43,7 +43,15 @@ class HolidayPackageController extends Controller
             $data = array_intersect_key($data, array_flip((new HolidayPackage)->getFillable()));
             $data['featured'] = $request->boolean('featured');
             $data['is_best_seller'] = $request->boolean('is_best_seller');
+            $data['robots_index'] = $request->boolean('robots_index');
+            $data['robots_follow'] = $request->boolean('robots_follow');
             $data['slug'] = $this->generateUniqueSlug(HolidayPackage::class, $request->filled('slug') ? $request->slug : $request->title);
+
+            if ($request->hasFile('og_image')) {
+                $data['og_image'] = $request->file('og_image')->store('holiday-packages/og', 'public');
+            } else {
+                unset($data['og_image']);
+            }
 
             $package = HolidayPackage::create($data);
             $this->syncAllSections($request, $package);
@@ -76,11 +84,22 @@ class HolidayPackageController extends Controller
             $data = array_intersect_key($data, array_flip((new HolidayPackage)->getFillable()));
             $data['featured'] = $request->boolean('featured');
             $data['is_best_seller'] = $request->boolean('is_best_seller');
+            $data['robots_index'] = $request->boolean('robots_index');
+            $data['robots_follow'] = $request->boolean('robots_follow');
 
             if ($request->filled('slug') && $holidayPackage->slug !== $request->slug) {
                 $data['slug'] = $this->generateUniqueSlug(HolidayPackage::class, $request->slug, $holidayPackage->id);
             } elseif (!$request->filled('slug') && $holidayPackage->title !== $request->title) {
                 $data['slug'] = $this->generateUniqueSlug(HolidayPackage::class, $request->title, $holidayPackage->id);
+            }
+
+            if ($request->hasFile('og_image')) {
+                if ($holidayPackage->og_image) {
+                    Storage::disk('public')->delete($holidayPackage->og_image);
+                }
+                $data['og_image'] = $request->file('og_image')->store('holiday-packages/og', 'public');
+            } else {
+                unset($data['og_image']);
             }
 
             $holidayPackage->update($data);

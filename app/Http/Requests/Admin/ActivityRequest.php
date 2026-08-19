@@ -24,6 +24,19 @@ class ActivityRequest extends FormRequest
             'image'           => 'nullable|image|max:2048',
             'status'          => 'required|in:active,inactive',
             'sort_order'      => 'nullable|integer|min:0',
+
+            // SEO
+            'meta_title'       => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keywords'    => 'nullable|string|max:255',
+            'focus_keyword'    => 'nullable|string|max:255',
+            'tags'             => 'nullable|string|max:255',
+            'canonical_url'    => 'nullable|url|max:255',
+            'og_title'         => 'nullable|string|max:255',
+            'og_description'   => 'nullable|string|max:500',
+            'og_image'         => 'nullable|image|max:2048',
+            'robots_index'     => 'nullable|boolean',
+            'robots_follow'    => 'nullable|boolean',
         ];
     }
 }

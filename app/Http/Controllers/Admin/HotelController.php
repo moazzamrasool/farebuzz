@@ -128,7 +128,17 @@ class HotelController extends Controller
     private function prepareData(HotelRequest $request, ?Hotel $hotel = null): array
     {
         $data = $request->validated();
-        unset($data['cover_image'], $data['gallery_images'], $data['amenity_ids'], $data['room_types'], $data['slug']);
+        unset($data['cover_image'], $data['gallery_images'], $data['amenity_ids'], $data['room_types'], $data['slug'], $data['og_image']);
+
+        $data['robots_index'] = $request->boolean('robots_index');
+        $data['robots_follow'] = $request->boolean('robots_follow');
+
+        if ($request->hasFile('og_image')) {
+            if ($hotel?->og_image) {
+                Storage::disk('public')->delete($hotel->og_image);
+            }
+            $data['og_image'] = $request->file('og_image')->store('hotels/og', 'public');
+        }
 
         if ($request->hasFile('cover_image')) {
             if ($hotel?->cover_image) {

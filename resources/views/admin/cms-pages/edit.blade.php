@@ -11,7 +11,7 @@
                 <h3 class="card-title">Edit Page</h3>
               </div>
               <div class="card-body">
-                <form action="{{ route('crm.cms-pages.update', $cmsPage->id) }}" method="POST">
+                <form action="{{ route('crm.cms-pages.update', $cmsPage->id) }}" method="POST" enctype="multipart/form-data">
                   @method('PUT')
                   @include('admin.cms-pages._form')
                 </form>

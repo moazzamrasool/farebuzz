@@ -1,5 +1,16 @@
 @extends('layouts.app')
 
+@php
+  $seo = \App\Support\Seo\SeoResolver::resolve(
+    null,
+    'FareBuzzer CRM – Travel Business Management Software',
+    'Run your travel business from one CRM — packages, bookings, enquiries and customers, all in one place.',
+    null,
+    route('crm.landing'),
+  );
+@endphp
+@include('partials._seo_head', ['seo' => $seo])
+
 @section('content')
 <style>
   .crm-hero {

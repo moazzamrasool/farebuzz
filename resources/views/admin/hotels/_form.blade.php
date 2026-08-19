@@ -172,5 +172,11 @@
   </div>
 </div>
 
+@include('admin.partials._seo_fields', [
+  'seo' => $htl,
+  'seoUrl' => $htl && $htl->slug ? route('hotels.show', $htl->slug) : null,
+  'seoPreviewFallback' => ($htl->name ?? 'Hotel').' – FareBuzzer',
+])
+
 <button type="submit" class="btn btn-primary">{{ $htl ? 'Update' : 'Create' }} Hotel</button>
 <a href="{{ route('crm.hotels.index') }}" class="btn btn-secondary">Cancel</a>

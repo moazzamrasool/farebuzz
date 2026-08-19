@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Thank You – FareBuzzer')
+@section('robots', 'noindex, follow')
 
 @push('styles')
 <style>

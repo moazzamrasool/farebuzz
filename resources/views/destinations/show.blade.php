@@ -1,17 +1,15 @@
 @extends('layouts.app')
 
-@section('title', $destination->meta_title ?: $destination->name.' – FareBuzzer')
-@section('meta_description', $destination->meta_description ?: Str::limit(strip_tags($destination->description), 160))
-@if($destination->meta_keywords)
-  @section('meta_keywords', $destination->meta_keywords)
-@endif
-@section('og_title', $destination->meta_title ?: $destination->name)
-@section('og_description', $destination->meta_description ?: Str::limit(strip_tags($destination->description), 160))
-@if($destination->cover_image)
-  @section('og_image', \App\Support\MediaUrl::resolve($destination->cover_image))
-@endif
-@section('og_url', route('destinations.show', $destination->slug))
-@section('canonical', route('destinations.show', $destination->slug))
+@php
+  $seo = \App\Support\Seo\SeoResolver::resolve(
+    $destination,
+    $destination->name.' – FareBuzzer',
+    $destination->description,
+    $destination->cover_image,
+    route('destinations.show', $destination->slug),
+  );
+@endphp
+@include('partials._seo_head', ['seo' => $seo])
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('frontend/asset/css/destination-tiles.css') }}">

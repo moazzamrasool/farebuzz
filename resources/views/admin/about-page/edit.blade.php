@@ -48,50 +48,6 @@
                   </div>
 
                   <hr>
-                  <h5 class="mb-1">Proof We Operate at Scale</h5>
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label for="scale_heading">Heading</label>
-                      <input type="text" name="scale_heading" id="scale_heading" class="form-control" value="{{ old('scale_heading', $about->scale_heading) }}" placeholder="Proof We Operate at Scale">
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label for="scale_subheading">Subheading</label>
-                      <input type="text" name="scale_subheading" id="scale_subheading" class="form-control" value="{{ old('scale_subheading', $about->scale_subheading) }}" placeholder="Tours operated across the globe">
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label for="founded_year">Founded Year <small class="text-muted">used by the "Years in business" live stat source below</small></label>
-                    <input type="number" name="founded_year" id="founded_year" class="form-control @error('founded_year') is-invalid @enderror"
-                      value="{{ old('founded_year', $about->founded_year) }}" style="max-width:160px;" min="1900" max="{{ now()->year }}">
-                    @error('founded_year') <span class="text-danger">{{ $message }}</span> @enderror
-                  </div>
-                  <p class="text-muted" style="font-size:13px;">Pick a live source to show a number computed from your data, or leave it as "Static value" and type the number yourself.</p>
-                  @for($i = 1; $i <= 4; $i++)
-                    <div class="form-row align-items-end border rounded p-2 mb-2 mx-0">
-                      <div class="form-group col-md-4">
-                        <label for="stat{{ $i }}_label">Stat {{ $i }} Label</label>
-                        <input type="text" name="stat{{ $i }}_label" id="stat{{ $i }}_label" class="form-control"
-                          value="{{ old("stat{$i}_label", $about->{"stat{$i}_label"}) }}" placeholder="e.g. Happy Travellers">
-                      </div>
-                      <div class="form-group col-md-3">
-                        <label for="stat{{ $i }}_value">Static Value</label>
-                        <input type="text" name="stat{{ $i }}_value" id="stat{{ $i }}_value" class="form-control"
-                          value="{{ old("stat{$i}_value", $about->{"stat{$i}_value"}) }}" placeholder="e.g. 50,000+">
-                      </div>
-                      <div class="form-group col-md-5">
-                        <label for="stat{{ $i }}_source">Source</label>
-                        <select name="stat{{ $i }}_source" id="stat{{ $i }}_source" class="form-control">
-                          @foreach(\App\Models\AboutPage::STAT_SOURCES as $value => $label)
-                            <option value="{{ $value }}" {{ old("stat{$i}_source", $about->{"stat{$i}_source"}) === $value ? 'selected' : '' }}>{{ $label }}</option>
-                          @endforeach
-                        </select>
-                      </div>
-                    </div>
-                  @endfor
-                  <h6 class="mt-3">Trust Badges <small class="text-muted">logos shown under the stats (press mentions, award badges, etc.)</small></h6>
-                  @include('admin.about-page._repeater', ['sectionKey' => 'trust_badge', 'addLabel' => 'Add Badge', 'titleLabel' => 'Alt Text', 'showLink' => true])
-
-                  <hr>
                   <h5 class="mb-3">Our Story</h5>
                   <div class="form-group">
                     <label for="story_heading">Heading</label>
@@ -273,90 +229,11 @@
                   </div>
                   @include('admin.about-page._repeater', ['sectionKey' => 'award', 'addLabel' => 'Add Award', 'titleLabel' => 'Alt Text'])
 
-                  <hr>
-                  <h5 class="mb-3">CTA Banner</h5>
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label for="cta_heading">Heading</label>
-                      <input type="text" name="cta_heading" id="cta_heading" class="form-control" value="{{ old('cta_heading', $about->cta_heading) }}" placeholder="Ready for your next trip?">
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label for="cta_text">Text</label>
-                      <input type="text" name="cta_text" id="cta_text" class="form-control" value="{{ old('cta_text', $about->cta_text) }}">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label for="cta_button_text">Button Text</label>
-                      <input type="text" name="cta_button_text" id="cta_button_text" class="form-control" value="{{ old('cta_button_text', $about->cta_button_text) }}" placeholder="Explore Packages">
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label for="cta_button_link">Button Link</label>
-                      <input type="text" name="cta_button_link" id="cta_button_link" class="form-control" value="{{ old('cta_button_link', $about->cta_button_link) }}" placeholder="/india-packages">
-                    </div>
-                  </div>
-
-                  <hr>
-                  <h5 class="mb-3">Secondary CTA Banner</h5>
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label for="cta2_heading">Heading</label>
-                      <input type="text" name="cta2_heading" id="cta2_heading" class="form-control" value="{{ old('cta2_heading', $about->cta2_heading) }}">
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label for="cta2_text">Text</label>
-                      <input type="text" name="cta2_text" id="cta2_text" class="form-control" value="{{ old('cta2_text', $about->cta2_text) }}">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label for="cta2_button_text">Button Text</label>
-                      <input type="text" name="cta2_button_text" id="cta2_button_text" class="form-control" value="{{ old('cta2_button_text', $about->cta2_button_text) }}">
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label for="cta2_button_link">Button Link</label>
-                      <input type="text" name="cta2_button_link" id="cta2_button_link" class="form-control" value="{{ old('cta2_button_link', $about->cta2_button_link) }}">
-                    </div>
-                  </div>
-
-                  <hr>
-                  <h5 class="mb-3">Career Banner</h5>
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label for="career_heading">Heading</label>
-                      <input type="text" name="career_heading" id="career_heading" class="form-control" value="{{ old('career_heading', $about->career_heading) }}" placeholder="Explore a Career Where Travel Ignites You">
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label for="career_text">Text</label>
-                      <input type="text" name="career_text" id="career_text" class="form-control" value="{{ old('career_text', $about->career_text) }}">
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group col-md-6">
-                      <label for="career_button_text">Button Text</label>
-                      <input type="text" name="career_button_text" id="career_button_text" class="form-control" value="{{ old('career_button_text', $about->career_button_text) }}" placeholder="View Openings">
-                    </div>
-                    <div class="form-group col-md-6">
-                      <label for="career_button_link">Button Link</label>
-                      <input type="text" name="career_button_link" id="career_button_link" class="form-control" value="{{ old('career_button_link', $about->career_button_link) }}" placeholder="/careers">
-                    </div>
-                  </div>
-
-                  <hr>
-                  <a href="#seoPanel" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="seoPanel" class="d-inline-flex align-items-center mb-2" style="text-decoration:none;">
-                    <h6 class="mb-0">SEO Settings</h6>
-                    <i class="fa fa-chevron-down ml-2" style="font-size:12px;"></i>
-                  </a>
-                  <div class="collapse" id="seoPanel">
-                    <div class="form-group">
-                      <label for="meta_title">Meta Title</label>
-                      <input type="text" name="meta_title" id="meta_title" class="form-control" value="{{ old('meta_title', $about->meta_title) }}">
-                    </div>
-                    <div class="form-group">
-                      <label for="meta_description">Meta Description</label>
-                      <textarea name="meta_description" id="meta_description" rows="2" maxlength="255" class="form-control">{{ old('meta_description', $about->meta_description) }}</textarea>
-                    </div>
-                  </div>
+                  @include('admin.partials._seo_fields', [
+                    'seo' => $about,
+                    'seoUrl' => route('about-us'),
+                    'seoPreviewFallback' => 'About Us – FareBuzzer',
+                  ])
 
                   <button type="submit" class="btn btn-primary">Save Changes</button>
                   <a href="{{ url('/about-us') }}" target="_blank" class="btn btn-secondary">Preview</a>
