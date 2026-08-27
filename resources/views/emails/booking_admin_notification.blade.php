@@ -20,6 +20,9 @@
                 @if($booking->booking_type === 'hotel')
                   <tr><td style="color:#888;width:160px;">Hotel</td><td>{{ $booking->hotel->name ?? $booking->package_title }}</td></tr>
                   <tr><td style="color:#888;">Room Type</td><td>{{ $booking->room_type_name }}</td></tr>
+                  @if($booking->room_type_bed_type)
+                    <tr><td style="color:#888;">Bed Type</td><td>{{ $booking->room_type_bed_type->label() }}</td></tr>
+                  @endif
                 @else
                   <tr><td style="color:#888;width:160px;">Package</td><td>{{ $booking->package_title }}</td></tr>
                 @endif

@@ -391,10 +391,10 @@
               <span class="mmt-input-val" id="ac-category-val">All Categories</span>
               <span class="mmt-sub" id="ac-category-sub">Type of experience</span>
             </div>
-            <select id="ac-category" name="category" class="mmt-select-hidden">
+            <select id="ac-category" name="activity_category_id" class="mmt-select-hidden">
               <option value="" selected>All Categories</option>
-              @foreach(\App\Models\Activity::forSite()->whereNotNull('category')->distinct()->orderBy('category')->pluck('category') as $cat)
-                <option value="{{ $cat }}">{{ $cat }}</option>
+              @foreach(\App\Models\ActivityCategory::forSite()->where('status', 'active')->orderBy('sort_order')->orderBy('name')->get() as $cat)
+                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
               @endforeach
             </select>
           </div>

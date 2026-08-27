@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BedType;
 use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,6 +33,7 @@ class HotelRoomType extends Model
         return [
             'images' => 'array',
             'refundable' => 'boolean',
+            'bed_type' => BedType::class,
         ];
     }
 

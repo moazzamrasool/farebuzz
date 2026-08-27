@@ -1,0 +1,139 @@
+{
+  "title": "Nepal Travel",
+  "subtitle": "with Muktinath & Jomsom",
+  "tripMonth": "October 2026",
+  "duration": "5 Nights / 6 Days",
+  "destinations": ["Kathmandu", "Pokhara", "Jomsom"],
+  "coverImages": ["pashupatinath", "phewa_lake", "muktinath_temple"],
+  "hotels": [
+    { "city": "Kathmandu", "name": "Amala / Tapas / Similar", "category": "3 Star", "detail": "Central location, breakfast & dinner included" },
+    { "city": "Pokhara", "name": "White Pearl / Murano / Similar", "category": "3 Star", "detail": "Walkable to Fewa Lake, breakfast & dinner included" },
+    { "city": "Jomsom", "name": "Trekker's Inn / Similar", "category": "3 Star", "detail": "Gateway to Muktinath, breakfast & dinner included" }
+  ],
+  "vehicles": {
+    "note": "Non-AC vehicle used for the Jomsom sector.",
+    "rows": [
+      { "pax": "2", "ktmPokhara": "AC Sedan", "seater": "3", "jomsom": "Non-AC Scorpio" },
+      { "pax": "4-6", "ktmPokhara": "AC Scorpio", "seater": "4-6", "jomsom": "Non-AC Scorpio" },
+      { "pax": "8-10", "ktmPokhara": "AC Hiace", "seater": "12", "jomsom": "Non-AC Scorpio (2 vehicles)" }
+    ]
+  },
+  "packageCost": {
+    "note": "Nett & non-commissionable. Valid for Indian nationals only.",
+    "rows": [
+      { "pax": "02 Pax", "price": "Rs. 38,570/-" },
+      { "pax": "04 Pax", "price": "Rs. 28,600/-" },
+      { "pax": "06 Pax", "price": "Rs. 23,070/-" },
+      { "pax": "08 Pax", "price": "Rs. 22,220/-" },
+      { "pax": "10 Pax", "price": "Rs. 20,180/-" }
+    ]
+  },
+  "days": [
+    {
+      "day": 1,
+      "city": "Kathmandu",
+      "overnight": "Overnight in Kathmandu",
+      "highlights": ["Airport Pickup", "Hotel Check-in", "Pashupatinath Temple", "Boudhanath Stupa"],
+      "bullets": [
+        "Arrival & transfer to hotel",
+        "Visit Pashupatinath Temple",
+        "Visit Boudhanath Stupa",
+        "Evening: stroll Thamel Market (own cost, no vehicle provided)"
+      ],
+      "images": ["pashupatinath", "thamel"],
+      "callout": "Evening Thamel Market walk is on your own cost — vehicle not provided."
+    },
+    {
+      "day": 2,
+      "city": "Pokhara",
+      "overnight": "Overnight in Pokhara",
+      "highlights": ["Scenic Drive", "Mt. Fishtail Views", "Fewa Lake Boating"],
+      "bullets": [
+        "Drive from Kathmandu to Pokhara",
+        "Chance to view Mt. Fishtail (Machapuchare)",
+        "Evening boating at Fewa Lake (own cost)",
+        "Boating point walkable from hotel",
+        "Stroll the streets of Pokhara"
+      ],
+      "images": ["fewa_lake_alt", "phewa_lake"],
+      "callout": "Fewa Lake boating is at your own cost — boating point is walkable from the hotel."
+    },
+    {
+      "day": 3,
+      "city": "Jomsom",
+      "overnight": "Overnight in Jomsom",
+      "highlights": ["Drive to 2,700m", "Dhampus Lake", "Marpha Village"],
+      "bullets": [
+        "Drive to Jomsom (2,700m elevation)",
+        "Gateway between Himalayan foothills & Tibetan Plateau",
+        "Visit Dhampus Lake",
+        "Visit Marpha Village"
+      ],
+      "images": ["jomsom", "marpha"],
+      "callout": null
+    },
+    {
+      "day": 4,
+      "city": "Muktinath → Pokhara",
+      "overnight": "Overnight in Pokhara",
+      "highlights": ["Muktinath Darshan", "Davis Falls", "Bindi Basini Temple", "Gupteswar Cave"],
+      "bullets": [
+        "Early morning Muktinath Darshan",
+        "Muktinath also known as “Phulashram”",
+        "15-20 min walk from hotel to sharing jeep point",
+        "After breakfast, transfer to Pokhara",
+        "Visit Davis Falls, Bindi Basini Temple & Gupteswar Cave"
+      ],
+      "images": ["muktinath_temple", "davis_falls"],
+      "callout": "Pax must walk 15-20 minutes from the hotel to catch the sharing jeep to Muktinath."
+    },
+    {
+      "day": 5,
+      "city": "Pokhara → Kathmandu",
+      "overnight": "Overnight in Kathmandu",
+      "highlights": ["Manakamana Cable Car", "Swayambhunath Temple", "Patan Durbar Square"],
+      "bullets": [
+        "Transfer to Kathmandu",
+        "En route: Manakamana Cable Car (tickets on own cost)",
+        "Visit Swayambhunath Temple",
+        "Visit Patan Durbar Square"
+      ],
+      "images": ["manakamana_temple", "swayambhunath"],
+      "callout": "Manakamana Cable Car tickets are on your own cost."
+    },
+    {
+      "day": 6,
+      "city": "Departure",
+      "overnight": null,
+      "highlights": ["Airport Transfer", "Departure"],
+      "bullets": [
+        "After breakfast, transfer to Kathmandu Airport",
+        "Departure with beautiful memories of Nepal"
+      ],
+      "images": ["kathmandu_airport"],
+      "callout": null,
+      "closingLine": "Take home not just photographs, but a heart full of unforgettable memories, breathtaking landscapes, and the timeless charm of Nepal. We look forward to welcoming you again!"
+    }
+  ],
+  "inclusions": [
+    "Accommodation & meal plan as per above",
+    "Arrival/departure transfers & sightseeing as per itinerary",
+    "Breakfast & Dinner included",
+    "Kathmandu – Pokhara – Kathmandu transfer by AC vehicle",
+    "Jomsom / Muktinath permit",
+    "Jomsom – Muktinath transfer by Non-AC vehicle"
+  ],
+  "exclusions": [
+    "5% GST",
+    "Airfare",
+    "Tour Guide / Manager",
+    "Entrance fees during sightseeing",
+    "Anything not mentioned above"
+  ],
+  "notes": [
+    "Cost based on 2/4/6/8/10 adults; Nett & non-commissionable; Indian nationality only",
+    "Hotels subject to availability at time of confirmation",
+    "Vehicle is point-to-point per itinerary only — not on disposal basis",
+    "Pickup and drop ex-Kathmandu Airport"
+  ]
+}

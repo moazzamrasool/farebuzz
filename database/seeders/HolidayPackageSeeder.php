@@ -96,7 +96,11 @@ class HolidayPackageSeeder extends Seeder
         $round50 = fn (float $n) => (int) (round($n / 50) * 50);
 
         return [
-            ['name' => 'Standard Room', 'price' => $round50($price), 'discounted_price' => $round50($discounted)],
+            // Standard tier is the package's own advertised price, verbatim — no
+            // rounding — since the listing card and the detail page's default price
+            // block both need to show this exact figure. Only the upsell tiers below
+            // are rounded to a clean number, since they're genuinely different prices.
+            ['name' => 'Standard Room', 'price' => $price, 'discounted_price' => $discounted],
             ['name' => 'Deluxe Room',   'price' => $round50($price * 1.22), 'discounted_price' => $round50($discounted * 1.20)],
             ['name' => 'Premium Suite', 'price' => $round50($price * 1.48), 'discounted_price' => $round50($discounted * 1.45)],
         ];

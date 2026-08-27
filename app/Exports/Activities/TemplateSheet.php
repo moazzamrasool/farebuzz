@@ -24,7 +24,7 @@ class TemplateSheet implements FromArray, WithHeadings, WithTitle
                 'Explore vibrant coral reefs with a certified instructor.', 3500, '', 'active', 1,
             ],
             [
-                'Sunset Cruise', '', 'Goa', '', 'Cruises',
+                'Sunset Cruise', '', 'Goa', '', '',
                 'A relaxed evening cruise along the coast.', 1200, '', 'active', 2,
             ],
         ];

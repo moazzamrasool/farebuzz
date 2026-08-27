@@ -27,6 +27,8 @@
     <small class="text-muted d-block mt-1">Click to replace this photo.</small>
   @endif
 
+  <input type="text" name="photos[{{ $index }}][alt_text]" class="form-control form-control-sm mt-2" placeholder="Alt text (e.g. Shikara boats on Dal Lake, Srinagar)" value="{{ $item->alt_text ?? '' }}">
+
   <div class="photo-card-footer">
     <label class="photo-cover-pill mb-0">
       <input type="checkbox" name="photos[{{ $index }}][is_cover]" value="1" {{ ($item->is_cover ?? false) ? 'checked' : '' }}>

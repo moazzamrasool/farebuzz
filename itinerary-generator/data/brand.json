@@ -1,0 +1,19 @@
+{
+  "name": "FareBuzzer",
+  "wordmark": "FAREBUZZER",
+  "website": "www.farebuzzertravel.com",
+  "phone": "+91 7943627590",
+  "whatsapp": "+91 8447843676",
+  "tagline": "Your trusted travel companion for flights, hotels, holidays, trains and more.",
+  "logo": "../assets/logo/farebuzzer-logo.png",
+  "colors": {
+    "orange": "#FF6B1A",
+    "orangeDark": "#E4590E",
+    "navy": "#0B2545",
+    "navyLight": "#15335F",
+    "cream": "#FAF9F6",
+    "white": "#FFFFFF",
+    "divider": "#E8E8E4",
+    "ink": "#1C2430"
+  }
+}

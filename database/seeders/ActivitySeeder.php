@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\Activity;
+use App\Models\ActivityCategory;
 use App\Models\Destination;
 use App\Support\SiteTenant;
+use App\Traits\GeneratesUniqueSlug;
 use Database\Seeders\Concerns\GeneratesDemoImages;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
@@ -12,7 +14,44 @@ use Illuminate\Support\Str;
 
 class ActivitySeeder extends Seeder
 {
-    use GeneratesDemoImages;
+    use GeneratesDemoImages, GeneratesUniqueSlug;
+
+    // Same names/icons as the activities:backfill-categories command's known set.
+    private const CATEGORY_ICONS = [
+        'water sports' => 'bi-water',
+        'sightseeing'  => 'bi-binoculars-fill',
+        'adventure'    => 'bi-lightning-charge-fill',
+        'wildlife'     => 'bi-tree-fill',
+        'beaches'      => 'bi-umbrella-fill',
+    ];
+
+    private array $activityCategoryCache = [];
+
+    private function resolveActivityCategoryId(string $name, ?string $uniqueId): int
+    {
+        $cacheKey = ($uniqueId ?? '').'|'.$name;
+        if (isset($this->activityCategoryCache[$cacheKey])) {
+            return $this->activityCategoryCache[$cacheKey];
+        }
+
+        $category = ActivityCategory::withoutGlobalScopes()
+            ->where('unique_id', $uniqueId)
+            ->where('name', $name)
+            ->first();
+
+        if (!$category) {
+            $category = ActivityCategory::withoutGlobalScopes()->forceCreate([
+                'unique_id'  => $uniqueId,
+                'name'       => $name,
+                'slug'       => $this->generateUniqueSlug(ActivityCategory::class, $name),
+                'icon'       => self::CATEGORY_ICONS[strtolower($name)] ?? null,
+                'status'     => 'active',
+                'sort_order' => 0,
+            ]);
+        }
+
+        return $this->activityCategoryCache[$cacheKey] = $category->id;
+    }
 
     public function run(): void
     {
@@ -77,13 +116,13 @@ class ActivitySeeder extends Seeder
             $model = Activity::updateOrCreate(
                 ['slug' => Str::slug($activity['name'])],
                 [
-                    'destination_id' => $activity['destination']?->id,
-                    'name'           => $activity['name'],
-                    'category'       => $activity['category'],
-                    'description'    => $activity['description'],
-                    'price'          => $activity['price'],
-                    'status'         => 'active',
-                    'sort_order'     => $index,
+                    'destination_id'       => $activity['destination']?->id,
+                    'name'                 => $activity['name'],
+                    'activity_category_id' => $this->resolveActivityCategoryId($activity['category'], null),
+                    'description'          => $activity['description'],
+                    'price'                => $activity['price'],
+                    'status'               => 'active',
+                    'sort_order'           => $index,
                 ]
             );
 
@@ -174,15 +213,15 @@ class ActivitySeeder extends Seeder
             $model = Activity::updateOrCreate(
                 ['slug' => Str::slug($activity['name'])],
                 [
-                    'unique_id'      => SiteTenant::id(),
-                    'destination_id' => $destination?->id,
-                    'name'           => $activity['name'],
-                    'category'       => $activity['category'],
-                    'description'    => $activity['description'],
-                    'duration'       => $activity['duration'],
-                    'price'          => $activity['price'],
-                    'status'         => 'active',
-                    'sort_order'     => 200 + $index,
+                    'unique_id'            => SiteTenant::id(),
+                    'destination_id'       => $destination?->id,
+                    'name'                 => $activity['name'],
+                    'activity_category_id' => $this->resolveActivityCategoryId($activity['category'], SiteTenant::id()),
+                    'description'          => $activity['description'],
+                    'duration'             => $activity['duration'],
+                    'price'                => $activity['price'],
+                    'status'               => 'active',
+                    'sort_order'           => 200 + $index,
                 ]
             );
 

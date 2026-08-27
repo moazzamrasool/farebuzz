@@ -37,7 +37,7 @@ class SeoMetaContentSeeder extends Seeder
     // destination slug => [meta_title, meta_description] for the /destinations/{slug}/packages page
     private const DESTINATION_PACKAGE_PAGES = [
         'kashmir' => [
-            'Kashmir Tour Packages Get 50% off on Kashmir Trip',
+            'Kashmir Tour Packages | 6D/5N from ₹15,499',
             'Explore Kashmir Tour Packages with curated itineraries, hotels, sightseeing and transfers. Plan holidays for couples, families or groups with FareBuzzer Travel.',
         ],
         'himachal-pradesh' => [

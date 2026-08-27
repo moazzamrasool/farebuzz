@@ -6,7 +6,13 @@
   $selectedInclusionIds = old('inclusion_feature_ids', $hp ? $hp->inclusionFeatures->pluck('id')->all() : []);
   $selectedExclusionIds = old('exclusion_feature_ids', $hp ? $hp->exclusionFeatures->pluck('id')->all() : []);
   $selectedRelatedIds = old('related_ids', $hp ? $hp->relatedPackages->pluck('id')->all() : []);
-  $dayCount = (int) old('days', $hp->days ?? 1);
+  // Drives the "Check-in Day" selects on the Hotels/Activities tabs. Derived from
+  // the itinerary rows actually present (not the old nights/days inputs, which no
+  // longer exist) so it stays correct across a failed-validation re-render too.
+  $dayCount = max(count(old('itineraries', $hp ? $hp->itineraries->toArray() : [])), 1);
+  $nightsDaysPreview = $hp && $hp->itineraries->count() > 0
+    ? $hp->nights.' Nights / '.$hp->days.' Days — based on '.$hp->itineraries->count().' itinerary days'
+    : 'Will be calculated from itinerary';
   $currentAdmin = \Illuminate\Support\Facades\Auth::guard('admin')->user();
   $aiEnabled = \App\Models\AiPackageSetting::isEnabledForCurrentTenant();
 @endphp
@@ -107,23 +113,27 @@
     </div>
 
     <div class="form-row">
-      <div class="form-group col-md-2">
-        <label for="nights">Nights</label>
-        <input type="number" min="0" name="nights" id="nights" class="form-control @error('nights') is-invalid @enderror" value="{{ old('nights', $hp->nights ?? 0) }}" required>
-        @error('nights') <span class="text-danger">{{ $message }}</span> @enderror
-      </div>
-      <div class="form-group col-md-2">
-        <label for="days">Days <small class="text-muted">(nights + 1)</small></label>
-        <input type="number" min="1" name="days" id="days" class="form-control @error('days') is-invalid @enderror" value="{{ old('days', $hp->days ?? 1) }}" required>
-        @error('days') <span class="text-danger">{{ $message }}</span> @enderror
+      <div class="form-group col-md-3">
+        <label>Nights / Days <small class="text-muted">(derived from itinerary)</small></label>
+        <input type="text" id="nightsDaysPreview" class="form-control" value="{{ $nightsDaysPreview }}" readonly>
       </div>
       <div class="form-group col-md-3">
-        <label for="hotel_category">Hotel Category</label>
-        <input type="text" name="hotel_category" id="hotel_category" class="form-control" value="{{ old('hotel_category', $hp->hotel_category ?? '') }}" placeholder="e.g. 4&#9733; Deluxe">
+        <label for="hotel_category">Hotel Category <small class="text-muted">(derived from attached hotels)</small></label>
+        <input type="text" id="hotel_category_display" class="form-control" value="" readonly style="{{ old('hotel_category_overridden', $hp->hotel_category_overridden ?? false) ? 'display:none;' : '' }}">
+        <input type="text" name="hotel_category" id="hotel_category" class="form-control mt-1" value="{{ old('hotel_category', $hp->hotel_category ?? '') }}" placeholder="e.g. 4 Star Hotels + Houseboat" style="{{ old('hotel_category_overridden', $hp->hotel_category_overridden ?? false) ? '' : 'display:none;' }}">
+        <div class="custom-control custom-checkbox mt-1">
+          <input type="checkbox" class="custom-control-input" id="hotel_category_overridden" name="hotel_category_overridden" value="1" {{ old('hotel_category_overridden', $hp->hotel_category_overridden ?? false) ? 'checked' : '' }}>
+          <label class="custom-control-label" for="hotel_category_overridden">Override</label>
+        </div>
       </div>
-      <div class="form-group col-md-2">
-        <label for="meals">Meals</label>
-        <input type="text" name="meals" id="meals" class="form-control" value="{{ old('meals', $hp->meals ?? '') }}" placeholder="e.g. Daily Breakfast">
+      <div class="form-group col-md-3">
+        <label for="meals">Meals <small class="text-muted">(derived from itinerary meal tags)</small></label>
+        <input type="text" id="meals_display" class="form-control" value="" readonly style="{{ old('meals_overridden', $hp->meals_overridden ?? false) ? 'display:none;' : '' }}">
+        <input type="text" name="meals" id="meals" class="form-control mt-1" value="{{ old('meals', $hp->meals ?? '') }}" placeholder="e.g. Daily Breakfast" style="{{ old('meals_overridden', $hp->meals_overridden ?? false) ? '' : 'display:none;' }}">
+        <div class="custom-control custom-checkbox mt-1">
+          <input type="checkbox" class="custom-control-input" id="meals_overridden" name="meals_overridden" value="1" {{ old('meals_overridden', $hp->meals_overridden ?? false) ? 'checked' : '' }}>
+          <label class="custom-control-label" for="meals_overridden">Override</label>
+        </div>
       </div>
       <div class="form-group col-md-3">
         <label for="language">Language</label>
@@ -422,7 +432,7 @@
             <div class="card-body">
               <div class="custom-control custom-checkbox mb-2">
                 <input type="checkbox" class="custom-control-input hotel-attach-toggle" id="htl_attach_{{ $hotel->id }}"
-                  name="hotels[{{ $hotel->id }}][attach]" value="1" {{ $isHotelAttached ? 'checked' : '' }}>
+                  name="hotels[{{ $hotel->id }}][attach]" value="1" data-star-rating="{{ $hotel->star_rating }}" {{ $isHotelAttached ? 'checked' : '' }}>
                 <label class="custom-control-label font-weight-bold" for="htl_attach_{{ $hotel->id }}">{{ $hotel->name }} <small class="text-muted">({{ $hotel->star_rating }}★)</small></label>
               </div>
               @if($hotel->cover_image)
@@ -442,14 +452,23 @@
                 </div>
                 <div class="form-group mb-2">
                   <label class="form-label-sm">Room Type <small class="text-muted">(sets the per-night price)</small></label>
-                  <select class="form-control form-control-sm" name="hotels[{{ $hotel->id }}][room_type_id]">
+                  <select class="form-control form-control-sm room-type-select" name="hotels[{{ $hotel->id }}][room_type_id]">
                     <option value="">— No room type (manual price) —</option>
                     @foreach($hotel->roomTypes as $room)
-                      <option value="{{ $room->id }}" {{ (string) old("hotels.$hotel->id.room_type_id", $attachedHotel->pivot->room_type_id ?? '') === (string) $room->id ? 'selected' : '' }}>
+                      <option value="{{ $room->id }}"
+                        data-price="{{ number_format($room->price, 2, '.', '') }}"
+                        data-discounted-price="{{ $room->discounted_price !== null ? number_format($room->discounted_price, 2, '.', '') : '' }}"
+                        data-bed-type="{{ $room->bed_type?->label() }}"
+                        data-adults="{{ $room->occupancy_adults }}"
+                        data-children="{{ $room->occupancy_children }}"
+                        data-size="{{ $room->size_sqft }}"
+                        data-meal-plan="{{ $room->mealPlanLabel }}"
+                        {{ (string) old("hotels.$hotel->id.room_type_id", $attachedHotel->pivot->room_type_id ?? '') === (string) $room->id ? 'selected' : '' }}>
                         {{ $room->name }} — ₹{{ number_format($room->sell_price, 2) }}/night
                       </option>
                     @endforeach
                   </select>
+                  <div class="room-type-detail small text-muted mt-1"></div>
                 </div>
                 <div class="form-group mb-2">
                   <label class="form-label-sm">Price Override / Night <small class="text-muted">(blank = room type price)</small></label>

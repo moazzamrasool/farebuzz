@@ -135,7 +135,6 @@
           No worries — it happens. Enter your registered email and we'll send you a link to get back into your account.
         </p>
         <div class="auth-left-stats">
-          <div class="stat-item"><span class="stat-num">2M+</span><span class="stat-lbl">Happy Travellers</span></div>
           <div class="stat-item"><span class="stat-num">500+</span><span class="stat-lbl">Destinations</span></div>
           <div class="stat-item"><span class="stat-num">24/7</span><span class="stat-lbl">Support</span></div>
         </div>

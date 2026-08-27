@@ -143,7 +143,7 @@
             <div class="room-card-name">{{ $room->name }}</div>
             <div class="room-card-meta">
               {{ $room->occupancy_adults }} Adult(s){{ $room->occupancy_children ? ', '.$room->occupancy_children.' Child(ren)' : '' }}
-              @if($room->bed_type) &middot; {{ $room->bed_type }} @endif
+              @if($room->bed_type) &middot; {{ $room->bed_type->label() }} @endif
               @if($room->size_sqft) &middot; {{ $room->size_sqft }} sqft @endif
             </div>
             <div>

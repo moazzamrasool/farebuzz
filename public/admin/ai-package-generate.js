@@ -155,11 +155,20 @@
     $('#aiPriceEstimateBanner').remove();
   });
 
+  // Hotel Category/Meals are normally auto-calculated from attached hotels/itinerary
+  // (see HolidayPackage::applyDerivedFields()) — the AI has no hotels attached yet to
+  // derive from, so its guess is applied as an Override rather than silently discarded.
+  function applyOverrideSuggestion(fieldId, value) {
+    if (!value) return;
+    $('#' + fieldId + '_overridden').prop('checked', true).trigger('change');
+    $('#' + fieldId).val(value);
+  }
+
   function applyDraft(draft) {
     $('#title').val(draft.title || '');
     if (draft.slug) $('#slug').val(draft.slug);
-    $('#hotel_category').val(draft.hotel_category || '');
-    $('#meals').val(draft.meals || '');
+    applyOverrideSuggestion('hotel_category', draft.hotel_category);
+    applyOverrideSuggestion('meals', draft.meals);
     $('#language').val(draft.language || '');
 
     var overviewHtml = draft.short_description
@@ -179,6 +188,8 @@
 
     fillItinerary(draft.itinerary);
     fillFaqs(draft.faqs);
+
+    if (window.FBRecomputeDerivedPreview) window.FBRecomputeDerivedPreview();
   }
 
   // ── Generate modal (only present when the AI feature is enabled) ──────────────
@@ -226,9 +237,6 @@
             $error.removeClass('d-none').text(response.message || 'Something went wrong.');
             return;
           }
-
-          // Nights drives Days via the existing #nights listener in custom.js.
-          $('#nights').val(payload.nights).trigger('input');
 
           applyDraft(response.data);
           $modal.modal('hide');

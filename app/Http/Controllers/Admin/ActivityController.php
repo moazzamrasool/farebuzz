@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ActivityRequest;
 use App\Imports\ActivitiesImport;
 use App\Models\Activity;
+use App\Models\ActivityCategory;
 use App\Models\Destination;
 use App\Models\TravelCategory;
 use App\Traits\GeneratesUniqueSlug;
@@ -19,17 +20,19 @@ class ActivityController extends Controller
 {
     use GeneratesUniqueSlug, HandlesBulkImportResponse;
 
-    public function index()
+    public function index(Request $request)
     {
-        $activities = Activity::with(['destination', 'travelCategory'])->orderBy('sort_order')->latest()->paginate(15);
-        [$destinations, $travelCategories] = $this->formOptions();
-        return view('admin.activities.index', compact('activities', 'destinations', 'travelCategories'));
+        $activities = Activity::with(['destination', 'travelCategory', 'activityCategory'])
+            ->when($request->filled('activity_category_id'), fn ($q) => $q->where('activity_category_id', $request->get('activity_category_id')))
+            ->orderBy('sort_order')->latest()->paginate(15)->withQueryString();
+        [$destinations, $travelCategories, $activityCategories] = $this->formOptions();
+        return view('admin.activities.index', compact('activities', 'destinations', 'travelCategories', 'activityCategories'));
     }
 
     public function create()
     {
-        [$destinations, $travelCategories] = $this->formOptions();
-        return view('admin.activities.create', compact('destinations', 'travelCategories'));
+        [$destinations, $travelCategories, $activityCategories] = $this->formOptions();
+        return view('admin.activities.create', compact('destinations', 'travelCategories', 'activityCategories'));
     }
 
     public function store(ActivityRequest $request)
@@ -68,11 +71,11 @@ class ActivityController extends Controller
             return response()->json([
                 'success' => true,
                 'activity' => [
-                    'id'                 => $activity->id,
-                    'destination_id'     => $activity->destination_id,
-                    'travel_category_id' => $activity->travel_category_id,
+                    'id'                    => $activity->id,
+                    'destination_id'        => $activity->destination_id,
+                    'travel_category_id'    => $activity->travel_category_id,
+                    'activity_category_id'  => $activity->activity_category_id,
                     'name'           => $activity->name,
-                    'category'       => $activity->category,
                     'description'    => $activity->description,
                     'duration'       => $activity->duration,
                     'price'          => $activity->price,
@@ -84,8 +87,8 @@ class ActivityController extends Controller
             ]);
         }
 
-        [$destinations, $travelCategories] = $this->formOptions();
-        return view('admin.activities.edit', compact('activity', 'destinations', 'travelCategories'));
+        [$destinations, $travelCategories, $activityCategories] = $this->formOptions();
+        return view('admin.activities.edit', compact('activity', 'destinations', 'travelCategories', 'activityCategories'));
     }
 
     public function update(ActivityRequest $request, Activity $activity)
@@ -184,14 +187,14 @@ class ActivityController extends Controller
     // Shared JSON shape used to render/update a table row after store/update
     private function toJsonRow(Activity $activity): array
     {
-        $activity->loadMissing('destination', 'travelCategory');
+        $activity->loadMissing('destination', 'travelCategory', 'activityCategory');
 
         return [
             'id'           => $activity->id,
             'image_url'    => $activity->image ? asset('storage/'.$activity->image) : null,
             'name'         => $activity->name,
             'destination_name' => $activity->destination->name ?? 'N/A',
-            'category'     => $activity->category ?? 'N/A',
+            'category'     => $activity->activityCategory->name ?? 'N/A',
             'travel_category_name' => $activity->travelCategory->name ?? 'N/A',
             'price'        => $activity->price ? number_format($activity->price, 2) : 'N/A',
             'status'       => $activity->status,
@@ -207,6 +210,7 @@ class ActivityController extends Controller
         return [
             Destination::where('status', 'active')->orderBy('name')->get(),
             TravelCategory::where('status', 'active')->orderBy('name')->get(),
+            ActivityCategory::where('status', 'active')->orderBy('sort_order')->orderBy('name')->get(),
         ];
     }
 }

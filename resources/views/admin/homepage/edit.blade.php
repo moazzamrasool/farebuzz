@@ -42,6 +42,11 @@
                             <label>{{ ucwords(str_replace('_', ' ', $field)) }}</label>
                             <textarea name="extra[{{ $field }}]" rows="2" class="form-control">{{ old("extra.$field", $section->extra[$field] ?? '') }}</textarea>
                           </div>
+                        @elseif(str_ends_with($field, '_enabled'))
+                          <div class="form-group col-md-4 form-check" style="padding-top:32px;">
+                            <input type="checkbox" name="extra[{{ $field }}]" id="extra_{{ $field }}" class="form-check-input" value="1" {{ old("extra.$field", $section->extra[$field] ?? false) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="extra_{{ $field }}">{{ ucwords(str_replace('_', ' ', $field)) }}</label>
+                          </div>
                         @else
                           <div class="form-group col-md-4">
                             <label>{{ ucwords(str_replace('_', ' ', $field)) }}</label>

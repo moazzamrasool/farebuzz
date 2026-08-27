@@ -14,6 +14,7 @@ class PackagePhoto extends Model
     protected $fillable = [
         'holiday_package_id',
         'path',
+        'alt_text',
         'is_cover',
         'sort_order',
     ];

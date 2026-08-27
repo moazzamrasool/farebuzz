@@ -24,6 +24,20 @@
                 </div>
               </div>
               <!-- /.card-header -->
+              <div class="card-body border-bottom py-2">
+                <form method="GET" class="form-inline">
+                  <label for="filter_activity_category_id" class="mr-2 mb-0">Category</label>
+                  <select name="activity_category_id" id="filter_activity_category_id" class="form-control form-control-sm mr-2" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    @foreach($activityCategories as $category)
+                      <option value="{{ $category->id }}" {{ (string) request('activity_category_id') === (string) $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                    @endforeach
+                  </select>
+                  @if(request('activity_category_id'))
+                    <a href="{{ route('crm.activities.index') }}" class="btn btn-sm btn-link">Clear</a>
+                  @endif
+                </form>
+              </div>
               <div class="card-body table-responsive p-0">
                 <table class="table table-hover text-nowrap">
                   <thead>
@@ -51,7 +65,7 @@
                       </td>
                       <td class="cell-name">{{ $activity->name }}</td>
                       <td class="cell-destination">{{ $activity->destination->name ?? 'N/A' }}</td>
-                      <td class="cell-category">{{ $activity->category ?? 'N/A' }}</td>
+                      <td class="cell-category">{{ $activity->activityCategory->name ?? 'N/A' }}</td>
                       <td class="cell-price">{{ $activity->price ? number_format($activity->price, 2) : 'N/A' }}</td>
                       <td class="cell-status">
                         <form action="{{ route('crm.activities.toggle-status', $activity->id) }}" method="POST" class="d-inline">
@@ -136,9 +150,15 @@
 
           <div class="form-row">
             <div class="form-group col-md-6">
-              <label for="act_category">Category</label>
-              <input type="text" name="category" id="act_category" placeholder="e.g. Adventure, Water Sports, Sightseeing" class="form-control">
-              <span class="invalid-feedback d-block" data-error-for="category"></span>
+              <label for="act_activity_category_id">Category</label>
+              <select name="activity_category_id" id="act_activity_category_id" class="form-control">
+                <option value="">None</option>
+                @foreach($activityCategories as $category)
+                  <option value="{{ $category->id }}">{{ $category->name }}</option>
+                @endforeach
+                <option value="__add_new__">+ Add New Category</option>
+              </select>
+              <span class="invalid-feedback d-block" data-error-for="activity_category_id"></span>
             </div>
             <div class="form-group col-md-6">
               <label for="act_price">Price</label>
@@ -235,7 +255,7 @@
         $form.find('[name="destination_id"]').val(a.destination_id);
         $form.find('[name="travel_category_id"]').val(a.travel_category_id);
         $form.find('[name="name"]').val(a.name);
-        $form.find('[name="category"]').val(a.category);
+        $form.find('[name="activity_category_id"]').val(a.activity_category_id).data('prevVal', a.activity_category_id);
         $form.find('[name="duration"]').val(a.duration);
         $form.find('[name="price"]').val(a.price);
         $form.find('[name="description"]').val(a.description);
@@ -323,4 +343,6 @@
     }
   });
 </script>
+
+@include('admin.activity-categories._quick_add_modal')
 @endsection

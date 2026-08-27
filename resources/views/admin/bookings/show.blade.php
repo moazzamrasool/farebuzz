@@ -46,6 +46,9 @@
                       <table class="table table-borderless table-sm">
                         <tr><th style="width:160px;">Hotel</th><td>{{ $booking->hotel->name ?? $booking->package_title }}</td></tr>
                         <tr><th>Room Type</th><td>{{ $booking->room_type_name ?? '—' }}</td></tr>
+                        @if($booking->room_type_bed_type)
+                          <tr><th>Bed Type</th><td>{{ $booking->room_type_bed_type->label() }}</td></tr>
+                        @endif
                         <tr><th>Check-in</th><td>{{ $booking->check_in_date?->format('d M Y') }}</td></tr>
                         <tr><th>Check-out</th><td>{{ $booking->check_out_date?->format('d M Y') }}</td></tr>
                         <tr><th>Nights</th><td>{{ $booking->nights }}</td></tr>
@@ -105,7 +108,7 @@
                     <tbody>
                       @foreach($booking->hotels as $bookingHotel)
                         <tr>
-                          <td>{{ $bookingHotel->name }}</td>
+                          <td>{{ $bookingHotel->name }}@if($bookingHotel->bed_type) &middot; {{ $bookingHotel->bed_type->label() }}@endif</td>
                           <td>₹{{ number_format($bookingHotel->unit_price, 2) }}</td>
                           <td>{{ $bookingHotel->nights }}</td>
                           <td>₹{{ number_format($bookingHotel->line_total, 2) }}</td>

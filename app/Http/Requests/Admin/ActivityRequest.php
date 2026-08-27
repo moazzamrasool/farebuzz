@@ -14,10 +14,10 @@ class ActivityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'destination_id'     => 'nullable|exists:destinations,id',
-            'travel_category_id' => 'nullable|exists:travel_categories,id',
+            'destination_id'        => 'nullable|exists:destinations,id',
+            'travel_category_id'    => 'nullable|exists:travel_categories,id',
+            'activity_category_id'  => 'nullable|exists:activity_categories,id',
             'name'            => 'required|string|max:255',
-            'category'        => 'nullable|string|max:255',
             'description'     => 'nullable|string',
             'duration'        => 'nullable|string|max:255',
             'price'           => 'nullable|numeric|min:0',

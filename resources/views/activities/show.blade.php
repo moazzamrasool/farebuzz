@@ -51,7 +51,7 @@
     </nav>
     <h1 class="pkg-title-main">{{ $activity->name }}</h1>
     <div class="pkg-meta-row">
-      @if($activity->category)<span class="badge-meta">{{ $activity->category }}</span>@endif
+      @if($activity->activityCategory)<span class="badge-meta">{{ $activity->activityCategory->name }}</span>@endif
       @if($activity->destination)<span class="badge-meta"><i class="bi bi-geo-alt-fill"></i> {{ $activity->destination->name }}</span>@endif
     </div>
   </div>

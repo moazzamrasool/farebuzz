@@ -70,7 +70,9 @@ class HomepageSectionController extends Controller
 
         $extra = [];
         foreach ($config['extra_fields'] as $field) {
-            $extra[$field] = $request->input("extra.{$field}");
+            $extra[$field] = str_ends_with($field, '_enabled')
+                ? $request->boolean("extra.{$field}")
+                : $request->input("extra.{$field}");
         }
 
         if (($config['group']['type'] ?? null) === 'tabs') {

@@ -25,9 +25,19 @@ class PackageCoreSheetImport implements ToCollection, WithChunkReading, WithHead
 {
     use CollectsRowErrors, GeneratesUniqueSlug, ResolvesImportValues;
 
+    private array $createdPackageIds = [];
+
     public function chunkSize(): int
     {
         return 200;
+    }
+
+    // IDs created by this sheet — the controller uses these to recompute
+    // nights/days/hotel_category/meals once the Itinerary/Day Hotels sheets
+    // (which run after this one) have finished attaching their rows.
+    public function createdPackageIds(): array
+    {
+        return $this->createdPackageIds;
     }
 
     public function collection(Collection $rows): void
@@ -37,17 +47,15 @@ class PackageCoreSheetImport implements ToCollection, WithChunkReading, WithHead
             $label = "Package Core #{$excelRow}";
             $data = $row->toArray();
 
-            $nights = (int) ($data['nights'] ?? 0);
-
             $validator = Validator::make($data, [
                 'title' => 'required|string|max:255',
                 'slug' => 'nullable|string|max:255',
                 'destination' => 'required|string|max:255',
                 'categories' => 'nullable|string',
-                'nights' => 'required|integer|min:0',
-                'days' => 'nullable|integer|min:1',
                 'hotel_category' => 'nullable|string|max:255',
+                'hotel_category_override' => 'nullable|string',
                 'meals' => 'nullable|string|max:255',
+                'meals_override' => 'nullable|string',
                 'language' => 'nullable|string|max:255',
                 'places_to_visit' => 'nullable|string|max:255',
                 'overview' => 'nullable|string',
@@ -65,10 +73,12 @@ class PackageCoreSheetImport implements ToCollection, WithChunkReading, WithHead
 
             $rowErrors = [];
 
-            $days = trim((string) ($data['days'] ?? '')) !== '' ? (int) $data['days'] : $nights + 1;
-            if ($days !== $nights + 1) {
-                $rowErrors[] = "Days must equal Nights + 1 ({$nights} + 1 = ".($nights + 1).').';
-            }
+            // Nights/Days, and Hotel Category/Meals when not overridden, are recalculated
+            // from the Itinerary/Day Hotels sheets after the whole workbook finishes
+            // importing (see HolidayPackageController::bulkUpload()) — this row's values
+            // are only a placeholder to satisfy the NOT NULL nights/days columns until then.
+            $hotelCategoryOverridden = $this->toBoolean($data['hotel_category_override'] ?? null);
+            $mealsOverridden = $this->toBoolean($data['meals_override'] ?? null);
 
             $price = (float) $data['price'];
             $discountedPrice = trim((string) ($data['discounted_price'] ?? '')) !== '' ? (float) $data['discounted_price'] : null;
@@ -96,17 +106,19 @@ class PackageCoreSheetImport implements ToCollection, WithChunkReading, WithHead
             }
 
             try {
-                DB::transaction(function () use ($data, $destination, $categoryModels, $days, $nights, $price, $discountedPrice) {
+                DB::transaction(function () use ($data, $destination, $categoryModels, $price, $discountedPrice, $hotelCategoryOverridden, $mealsOverridden) {
                     $slugSeed = trim((string) ($data['slug'] ?? '')) !== '' ? $data['slug'] : $data['title'];
 
                     $package = HolidayPackage::create([
                         'destination_id' => $destination->id,
                         'title' => trim($data['title']),
                         'slug' => $this->generateUniqueSlug(HolidayPackage::class, $slugSeed),
-                        'nights' => $nights,
-                        'days' => $days,
-                        'hotel_category' => $this->nullableString($data['hotel_category'] ?? null),
-                        'meals' => $this->nullableString($data['meals'] ?? null),
+                        'nights' => 0,
+                        'days' => 0,
+                        'hotel_category' => $hotelCategoryOverridden ? $this->nullableString($data['hotel_category'] ?? null) : null,
+                        'hotel_category_overridden' => $hotelCategoryOverridden,
+                        'meals' => $mealsOverridden ? $this->nullableString($data['meals'] ?? null) : null,
+                        'meals_overridden' => $mealsOverridden,
                         'language' => $this->nullableString($data['language'] ?? null),
                         'places_to_visit' => $this->nullableString($data['places_to_visit'] ?? null),
                         'overview' => $this->nullableString($data['overview'] ?? null),
@@ -127,6 +139,8 @@ class PackageCoreSheetImport implements ToCollection, WithChunkReading, WithHead
                         'discounted_price' => $discountedPrice,
                         'sort_order' => 0,
                     ]);
+
+                    $this->createdPackageIds[] = $package->id;
                 });
 
                 $this->markImported();

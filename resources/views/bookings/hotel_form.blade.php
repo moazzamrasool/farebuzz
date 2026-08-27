@@ -103,6 +103,9 @@
         <div class="bk-summary">
           <h5 style="font-weight:800;font-size:15px;margin-bottom:16px;">Price Summary</h5>
           <div class="bk-summary-row"><span>Room</span><span>{{ $roomType->name }}</span></div>
+          @if($roomType->bed_type)
+            <div class="bk-summary-row"><span>Bed Type</span><span>{{ $roomType->bed_type->label() }}</span></div>
+          @endif
           <div class="bk-summary-row"><span>Rate / Night</span><span id="sum-rate">₹{{ number_format($roomType->sellPrice) }}</span></div>
           <div class="bk-summary-row"><span>Base Fare</span><span id="sum-base">₹0</span></div>
           <div class="bk-summary-row discount"><span>Discount</span><span id="sum-discount">−₹0</span></div>

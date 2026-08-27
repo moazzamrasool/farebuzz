@@ -93,6 +93,14 @@ class HolidayPackagesImport implements SkipsUnknownSheets, WithMultipleSheets
         return array_sum(array_map(fn ($import) => $import->importedCount(), $this->subImports()));
     }
 
+    // IDs of packages created by the Package Core sheet in this run — used by the
+    // controller to derive nights/days/hotel_category/meals once every sheet
+    // (itinerary, hotels, ...) has finished writing.
+    public function createdPackageIds(): array
+    {
+        return $this->coreImport->createdPackageIds();
+    }
+
     public function rowErrors(): array
     {
         return array_merge($this->missingSheetErrors, ...array_map(fn ($import) => $import->rowErrors(), $this->subImports()));

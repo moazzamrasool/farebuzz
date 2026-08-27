@@ -93,7 +93,7 @@
           @endif
 
           @unless($currentAdmin?->isSuperAdmin())
-            @php $masterDataActive = request()->is('crm/travel-categories*', 'crm/destinations*', 'crm/holiday-packages*', 'crm/packages*', 'crm/activities*', 'crm/amenities*', 'crm/hotels*', 'crm/hotel-reviews*', 'crm/inclusions*', 'crm/exclusions*', 'crm/bookings*'); @endphp
+            @php $masterDataActive = request()->is('crm/travel-categories*', 'crm/activity-categories*', 'crm/destinations*', 'crm/holiday-packages*', 'crm/packages*', 'crm/activities*', 'crm/amenities*', 'crm/hotels*', 'crm/hotel-reviews*', 'crm/inclusions*', 'crm/exclusions*', 'crm/bookings*'); @endphp
             <li class="nav-item {{ $masterDataActive ? 'menu-open' : '' }}">
               <a href="#" class="nav-link {{ $masterDataActive ? 'active' : '' }}">
                 <i class="fa fa-layer-group" aria-hidden="true"></i>
@@ -107,6 +107,12 @@
                   <a href="{{ route('crm.travel-categories.index') }}" class="nav-link {{ request()->is('crm/travel-categories*') ? 'active' : '' }}">
                     <i class="fa fa-tags nav-icon" aria-hidden="true"></i>
                     <p>Categories</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{ route('crm.activity-categories.index') }}" class="nav-link {{ request()->is('crm/activity-categories*') ? 'active' : '' }}">
+                    <i class="fa fa-icons nav-icon" aria-hidden="true"></i>
+                    <p>Activity Categories</p>
                   </a>
                 </li>
                 <li class="nav-item">

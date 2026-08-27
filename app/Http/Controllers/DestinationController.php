@@ -51,6 +51,7 @@ class DestinationController extends Controller
 
         $activities = $destination->activities()
             ->where('status', 'active')
+            ->with('activityCategory')
             ->orderBy('sort_order')
             ->limit(6)
             ->get();

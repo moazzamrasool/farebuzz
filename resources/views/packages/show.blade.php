@@ -246,13 +246,13 @@
 
       @if($photos->isNotEmpty())
         <div id="gallery" class="gallery-strip mb-4">
-          <div class="g-main"><img src="{{ \App\Support\MediaUrl::resolve($photos->first()->path) }}" alt="{{ $package->focus_keyword ?: $package->title }}"></div>
+          <div class="g-main"><img src="{{ \App\Support\MediaUrl::resolve($photos->first()->path) }}" alt="{{ $photos->first()->alt_text ?: ($package->focus_keyword ?: $package->title) }}"></div>
           @foreach($photos->skip(1)->take(3) as $photo)
-            <div><img src="{{ \App\Support\MediaUrl::resolve($photo->path) }}" alt="{{ $package->focus_keyword ?: $package->title }}"></div>
+            <div><img src="{{ \App\Support\MediaUrl::resolve($photo->path) }}" alt="{{ $photo->alt_text ?: ($package->focus_keyword ?: $package->title) }}"></div>
           @endforeach
           @if($photos->count() > 4)
             <div class="gallery-more">
-              <img src="{{ \App\Support\MediaUrl::resolve($photos->get(4)->path) }}" alt="{{ $package->focus_keyword ?: $package->title }}">
+              <img src="{{ \App\Support\MediaUrl::resolve($photos->get(4)->path) }}" alt="{{ $photos->get(4)->alt_text ?: ($package->focus_keyword ?: $package->title) }}">
               <div class="gallery-more-label">+{{ $photos->count() - 4 }} Photos</div>
             </div>
           @endif
@@ -495,7 +495,6 @@
         <button type="button" class="btn-enquire" id="btn-enquire-now">Enquire Now</button>
         <div class="trust-row">
           <span class="trust-item"><i class="bi bi-shield-check"></i> Secure Booking</span>
-          <span class="trust-item"><i class="bi bi-clock-history"></i> Free Cancellation*</span>
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\BelongsToTenant;
 use App\Models\Concerns\ForSiteTenant;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -80,6 +81,46 @@ class Hotel extends Model
     {
         return $this->belongsToMany(HolidayPackage::class, 'holiday_package_hotel')
             ->withPivot('id', 'room_type_id', 'price', 'is_optional', 'nights', 'note', 'sort_order');
+    }
+
+    public function scopeSearch(Builder $query, ?string $search): Builder
+    {
+        return $search
+            ? $query->where(function (Builder $q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")->orWhere('address', 'like', "%{$search}%");
+            })
+            : $query;
+    }
+
+    public function scopeDestination(Builder $query, $destinationId): Builder
+    {
+        return $destinationId ? $query->where('destination_id', $destinationId) : $query;
+    }
+
+    public function scopeStarRating(Builder $query, $starRating): Builder
+    {
+        return $starRating !== null && $starRating !== '' ? $query->where('star_rating', $starRating) : $query;
+    }
+
+    public function scopeStatus(Builder $query, ?string $status): Builder
+    {
+        return $status ? $query->where('status', $status) : $query;
+    }
+
+    public function scopePriceBetween(Builder $query, $min, $max): Builder
+    {
+        if (!$min && !$max) {
+            return $query;
+        }
+
+        return $query->whereHas('roomTypes', function (Builder $q) use ($min, $max) {
+            if ($min !== null && $min !== '') {
+                $q->whereRaw('COALESCE(discounted_price, price) >= ?', [$min]);
+            }
+            if ($max !== null && $max !== '') {
+                $q->whereRaw('COALESCE(discounted_price, price) <= ?', [$max]);
+            }
+        });
     }
 
     protected function averageRating(): Attribute

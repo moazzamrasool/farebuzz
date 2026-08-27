@@ -129,7 +129,7 @@ return [
             'support' => 'Support', 'download_app' => 'Download App',
             'legal' => 'Legal (bottom bar)',
         ]],
-        'extra_fields' => ['blurb', 'social_facebook', 'social_twitter', 'social_instagram', 'social_youtube', 'copyright_text'],
+        'extra_fields' => ['blurb', 'social_facebook', 'social_twitter', 'social_instagram', 'social_youtube', 'copyright_text', 'google_review_url', 'google_review_enabled'],
     ],
 
 ];

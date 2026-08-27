@@ -48,6 +48,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SearchTabSettingController;
 use App\Http\Controllers\Admin\SeoSettingController;
 use App\Http\Controllers\Admin\TrackingScriptController;
+use App\Http\Controllers\Admin\ActivityCategoryController;
 use App\Http\Controllers\Admin\TravelCategoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WhatsAppSettingController;
@@ -90,6 +91,15 @@ Route::prefix('crm')->group(function () {
             Route::put('travel-categories/{travelCategory}',             [TravelCategoryController::class, 'update'])->name('crm.travel-categories.update');
             Route::delete('travel-categories/{travelCategory}',          [TravelCategoryController::class, 'destroy'])->name('crm.travel-categories.destroy');
             Route::post('travel-categories/{travelCategory}/toggle-status', [TravelCategoryController::class, 'toggleStatus'])->name('crm.travel-categories.toggle-status');
+
+            // Activity Categories
+            Route::get('activity-categories',                                     [ActivityCategoryController::class, 'index'])->name('crm.activity-categories.index');
+            Route::get('activity-categories/create',                              [ActivityCategoryController::class, 'create'])->name('crm.activity-categories.create');
+            Route::post('activity-categories',                                    [ActivityCategoryController::class, 'store'])->name('crm.activity-categories.store');
+            Route::get('activity-categories/{activityCategory}/edit',             [ActivityCategoryController::class, 'edit'])->name('crm.activity-categories.edit');
+            Route::put('activity-categories/{activityCategory}',                  [ActivityCategoryController::class, 'update'])->name('crm.activity-categories.update');
+            Route::delete('activity-categories/{activityCategory}',               [ActivityCategoryController::class, 'destroy'])->name('crm.activity-categories.destroy');
+            Route::post('activity-categories/{activityCategory}/toggle-status',   [ActivityCategoryController::class, 'toggleStatus'])->name('crm.activity-categories.toggle-status');
 
             // Destinations
             Route::get('destinations',                               [DestinationController::class, 'index'])->name('crm.destinations.index');

@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Imports\Concerns\CollectsRowErrors;
 use App\Imports\Concerns\ResolvesImportValues;
 use App\Models\Activity;
+use App\Models\ActivityCategory;
 use App\Models\Destination;
 use App\Models\TravelCategory;
 use App\Traits\GeneratesUniqueSlug;
@@ -65,21 +66,29 @@ class ActivitiesImport implements ToCollection, WithChunkReading, WithHeadingRow
                 }
             }
 
+            $activityCategory = null;
+            if (trim((string) ($data['category'] ?? '')) !== '') {
+                $activityCategory = $this->findByName(ActivityCategory::class, $data['category']);
+                if (!$activityCategory) {
+                    $rowErrors[] = "Category '{$data['category']}' not found. Add it under Master Data > Activity Categories first.";
+                }
+            }
+
             if (!empty($rowErrors)) {
                 $this->addRowError($excelRow, $rowErrors);
                 continue;
             }
 
             try {
-                DB::transaction(function () use ($data, $destination, $travelCategory) {
+                DB::transaction(function () use ($data, $destination, $travelCategory, $activityCategory) {
                     $slugSeed = trim((string) ($data['slug'] ?? '')) !== '' ? $data['slug'] : $data['name'];
 
                     Activity::create([
                         'destination_id' => $destination?->id,
                         'travel_category_id' => $travelCategory?->id,
+                        'activity_category_id' => $activityCategory?->id,
                         'name' => trim($data['name']),
                         'slug' => $this->generateUniqueSlug(Activity::class, $slugSeed),
-                        'category' => $this->nullableString($data['category'] ?? null),
                         'description' => $this->nullableString($data['description'] ?? null),
                         'price' => $data['price'] !== null && $data['price'] !== '' ? $data['price'] : null,
                         'image' => $this->downloadImage($data['image_url'] ?? null, 'activities'),

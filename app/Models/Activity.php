@@ -16,6 +16,7 @@ class Activity extends Model
     protected $fillable = [
         'destination_id',
         'travel_category_id',
+        'activity_category_id',
         'name',
         'slug',
         'category',
@@ -54,6 +55,11 @@ class Activity extends Model
     public function travelCategory(): BelongsTo
     {
         return $this->belongsTo(TravelCategory::class);
+    }
+
+    public function activityCategory(): BelongsTo
+    {
+        return $this->belongsTo(ActivityCategory::class);
     }
 
     public function holidayPackages(): BelongsToMany

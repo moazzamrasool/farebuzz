@@ -569,6 +569,37 @@
     $card.find('.hotel-extra-fields').toggle(this.checked);
   });
 
+  // Room Type select on the Hotels tab — render the picked room's full details
+  // (prices, bed type, occupancy, size, meal plan) below the dropdown, since an
+  // <option> can't carry rich markup itself.
+  function renderRoomTypeDetail($select) {
+    var $opt = $select.find('option:selected');
+    var $detail = $select.closest('.form-group').find('.room-type-detail');
+    if (!$opt.val()) {
+      $detail.empty();
+      return;
+    }
+    var parts = [];
+    var price = parseFloat($opt.data('price'));
+    var discounted = $opt.data('discounted-price');
+    if (discounted !== '' && discounted !== undefined && discounted !== null) {
+      parts.push('₹' + parseFloat(discounted).toLocaleString('en-IN') + ' <s class="text-muted">₹' + price.toLocaleString('en-IN') + '</s>');
+    } else {
+      parts.push('₹' + price.toLocaleString('en-IN'));
+    }
+    if ($opt.data('bed-type')) parts.push($opt.data('bed-type'));
+    var occupancy = $opt.data('adults') + ' Adult' + ($opt.data('adults') == 1 ? '' : 's');
+    if ($opt.data('children')) occupancy += ', ' + $opt.data('children') + ' Child' + ($opt.data('children') == 1 ? '' : 'ren');
+    parts.push(occupancy);
+    if ($opt.data('size')) parts.push($opt.data('size') + ' sqft');
+    if ($opt.data('meal-plan')) parts.push($opt.data('meal-plan'));
+    $detail.html(parts.join(' &middot; '));
+  }
+
+  $(document).on('change', '.room-type-select', function () {
+    renderRoomTypeDetail($(this));
+  });
+
   $(document).on('keyup', '#hotelSearch', function () {
     var term = $(this).val().toLowerCase().trim();
     $('.hotel-card-col').each(function () {
@@ -585,19 +616,112 @@
     });
   });
 
-  // Holiday Package "Basic" tab — Days is derived from Nights (days = nights + 1), the
-  // day-wise itinerary/hotel/activity day pickers all key off this count. Days stays a
-  // plain editable input (so a save with a mismatched value still round-trips and gets
-  // caught by server-side validation) but auto-follows Nights on every change.
-  $(document).on('input', '#nights', function () {
-    var nights = parseInt($(this).val(), 10);
-    if (isNaN(nights) || nights < 0) return;
-    $('#days').val(nights + 1);
+  // Holiday Package "Basic" tab — Nights/Days, Hotel Category and Meals are all derived
+  // server-side (HolidayPackage::applyDerivedFields()); this is just a live preview so the
+  // admin can see what will be saved. The server always recomputes on save and is the
+  // source of truth — this preview is never submitted for nights/days, and only used for
+  // hotel_category/meals when their Override checkbox is off.
+  function recomputeDerivedPreview() {
+    var $itineraryRows = $('#itineraryRepeater [data-repeater-rows] > [data-repeater-row]');
+    var dayCount = $itineraryRows.length;
+
+    var $nightsDays = $('#nightsDaysPreview');
+    if ($nightsDays.length) {
+      $nightsDays.val(dayCount > 0
+        ? (dayCount - 1) + ' Nights / ' + dayCount + ' Days — based on ' + dayCount + ' itinerary day' + (dayCount === 1 ? '' : 's')
+        : 'Will be calculated from itinerary');
+    }
+
+    var stars = [];
+    $('.hotel-attach-toggle:checked').each(function () {
+      var rating = parseInt($(this).data('star-rating'), 10);
+      if (rating > 0 && stars.indexOf(rating) === -1) stars.push(rating);
+    });
+    stars.sort(function (a, b) { return a - b; });
+
+    var hotelCategoryText;
+    if (!stars.length) {
+      hotelCategoryText = 'Will be calculated from attached hotels';
+    } else if (stars.length === 1) {
+      hotelCategoryText = stars[0] + ' Star Hotels';
+    } else if (stars.length === 2) {
+      hotelCategoryText = stars[0] + ' & ' + stars[1] + ' Star Hotels';
+    } else {
+      hotelCategoryText = stars[0] + ' to ' + stars[stars.length - 1] + ' Star Hotels';
+    }
+    $('#hotel_category_display').val(hotelCategoryText);
+
+    var counts = { breakfast: 0, lunch: 0, dinner: 0 };
+    $itineraryRows.each(function () {
+      $(this).find('input[type="checkbox"][name$="[meal_tags][]"]:checked').each(function () {
+        if (counts.hasOwnProperty(this.value)) counts[this.value]++;
+      });
+    });
+
+    var mealsText;
+    var totalMeals = counts.breakfast + counts.lunch + counts.dinner;
+    if (dayCount === 0 || totalMeals === 0) {
+      mealsText = 'Will be calculated from itinerary';
+    } else {
+      var extras = [];
+      ['lunch', 'dinner'].forEach(function (meal) {
+        if (counts[meal] > 0) {
+          var label = meal.charAt(0).toUpperCase() + meal.slice(1);
+          extras.push(counts[meal] + ' ' + label + (counts[meal] > 1 ? 's' : ''));
+        }
+      });
+
+      // A day-1 arrival with no breakfast tag doesn't break "daily" breakfast —
+      // mirrors HolidayPackage::deriveMeals() server-side.
+      var $firstDayCheckboxes = $itineraryRows.first().find('input[type="checkbox"][name$="[meal_tags][]"]');
+      var firstDayHasBreakfast = $firstDayCheckboxes.filter('[value="breakfast"]:checked').length > 0;
+      var expectedBreakfastDays = firstDayHasBreakfast ? dayCount : dayCount - 1;
+
+      if (expectedBreakfastDays > 0 && counts.breakfast === expectedBreakfastDays) {
+        if (!extras.length) {
+          mealsText = 'Daily Breakfast';
+        } else if (extras.length === 1) {
+          mealsText = 'Daily Breakfast + ' + extras[0];
+        } else {
+          var last = extras.pop();
+          mealsText = 'Daily Breakfast, ' + extras.join(', ') + ' & ' + last;
+        }
+      } else {
+        var parts = [];
+        if (counts.breakfast > 0) parts.push(counts.breakfast + ' Breakfast' + (counts.breakfast > 1 ? 's' : ''));
+        parts = parts.concat(extras);
+        mealsText = parts.join(', ');
+      }
+    }
+    $('#meals_display').val(mealsText);
+  }
+
+  window.FBRecomputeDerivedPreview = recomputeDerivedPreview;
+
+  // Toggling "Override" swaps the read-only derived preview for a plain editable input.
+  $(document).on('change', '#hotel_category_overridden', function () {
+    $('#hotel_category_display').toggle(!this.checked);
+    $('#hotel_category').toggle(this.checked);
   });
+  $(document).on('change', '#meals_overridden', function () {
+    $('#meals_display').toggle(!this.checked);
+    $('#meals').toggle(this.checked);
+  });
+
+  // Recompute whenever anything the preview depends on changes: itinerary rows added/
+  // removed, meal tags toggled, or a hotel attached/detached.
+  $(document).on('click', '#itineraryRepeater [data-repeater-add], #itineraryRepeater [data-repeater-remove]', function () {
+    setTimeout(recomputeDerivedPreview, 0);
+  });
+  $(document).on('change', '#itineraryRepeater input[type="checkbox"][name$="[meal_tags][]"], .hotel-attach-toggle', recomputeDerivedPreview);
 
   $(function () {
     initImageUpload(document);
     initRepeater(document);
     initRichText(document);
+    $('.room-type-select').each(function () {
+      renderRoomTypeDetail($(this));
+    });
+    recomputeDerivedPreview();
   });
 })(jQuery);

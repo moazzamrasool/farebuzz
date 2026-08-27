@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             TravelCategorySeeder::class,
             DestinationSeeder::class,
             ActivitySeeder::class,
+            GulmargGondolaSeoSeeder::class,
             AmenitySeeder::class,
             PackageFeatureSeeder::class,
             HotelSeeder::class,

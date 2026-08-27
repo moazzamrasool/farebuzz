@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\BedType;
 use Illuminate\Foundation\Http\FormRequest;
 
 class HotelRequest extends FormRequest
@@ -56,7 +57,7 @@ class HotelRequest extends FormRequest
             'room_types.*.discounted_price'     => 'nullable|numeric|min:0|lte:room_types.*.price',
             'room_types.*.occupancy_adults'     => 'nullable|integer|min:1|max:20',
             'room_types.*.occupancy_children'   => 'nullable|integer|min:0|max:20',
-            'room_types.*.bed_type'             => 'nullable|string|max:255',
+            'room_types.*.bed_type'             => ['nullable', 'in:'.implode(',', array_column(BedType::cases(), 'value'))],
             'room_types.*.size_sqft'            => 'nullable|integer|min:0',
             'room_types.*.meal_plan'            => 'nullable|in:room_only,breakfast,breakfast_dinner',
             'room_types.*.refundable'           => 'nullable|boolean',

@@ -23,6 +23,9 @@
                 <table role="presentation" width="100%" cellpadding="6" cellspacing="0" style="font-size:13px;border-collapse:collapse;">
                   <tr><td style="color:#888;width:160px;">Hotel</td><td>{{ $booking->hotel->name ?? $booking->package_title }}</td></tr>
                   <tr><td style="color:#888;">Room Type</td><td>{{ $booking->room_type_name }}</td></tr>
+                  @if($booking->room_type_bed_type)
+                    <tr><td style="color:#888;">Bed Type</td><td>{{ $booking->room_type_bed_type->label() }}</td></tr>
+                  @endif
                   <tr><td style="color:#888;">Check-in</td><td>{{ $booking->check_in_date?->format('d M Y') }}</td></tr>
                   <tr><td style="color:#888;">Check-out</td><td>{{ $booking->check_out_date?->format('d M Y') }}</td></tr>
                   <tr><td style="color:#888;">Nights / Rooms</td><td>{{ $booking->nights }} night(s) &middot; {{ $booking->rooms }} room(s)</td></tr>

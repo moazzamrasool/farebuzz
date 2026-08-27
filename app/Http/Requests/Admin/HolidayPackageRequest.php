@@ -13,11 +13,6 @@ class HolidayPackageRequest extends FormRequest
 
     public function rules(): array
     {
-        // Days must always equal Nights + 1 — the day-wise itinerary/hotel/activity day
-        // pickers all key off this count. The admin form auto-fills Days from Nights via JS;
-        // this enforces it server-side too.
-        $nights = (int) $this->input('nights', 0);
-
         return [
             // Basic
             'destination_id'   => 'required|exists:destinations,id',
@@ -25,14 +20,13 @@ class HolidayPackageRequest extends FormRequest
             'slug'             => 'nullable|string|max:255',
             'category_ids'     => 'nullable|array',
             'category_ids.*'   => 'exists:travel_categories,id',
-            'nights'           => 'required|integer|min:0',
-            'days'             => ['required', 'integer', 'min:1', function ($attribute, $value, $fail) use ($nights) {
-                if ((int) $value !== $nights + 1) {
-                    $fail('Days must equal Nights + 1 ('.($nights + 1).').');
-                }
-            }],
-            'hotel_category'   => 'nullable|string|max:255',
-            'meals'            => 'nullable|string|max:255',
+            // Nights/Days are derived from the itinerary on save (HolidayPackage::applyDerivedFields())
+            // — not submitted by the form at all. Hotel Category/Meals are derived the same way
+            // unless their *_overridden flag is checked, in which case the typed text is kept as-is.
+            'hotel_category'            => 'nullable|string|max:255',
+            'hotel_category_overridden' => 'nullable|boolean',
+            'meals'                     => 'nullable|string|max:255',
+            'meals_overridden'          => 'nullable|boolean',
             'language'         => 'nullable|string|max:255',
             'places_to_visit'  => 'nullable|string|max:255',
             'is_best_seller'   => 'nullable|boolean',

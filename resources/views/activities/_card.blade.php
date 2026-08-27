@@ -1,18 +1,13 @@
-{{-- Shared activity card. Expects: $activity with destination loaded (or lazy-loads it). --}}
+{{-- Shared activity card. Expects: $activity with destination (and ideally activityCategory) loaded. --}}
 @php
-  $categoryIcons = [
-    'Water Sports' => 'bi-water',
-    'Adventure'    => 'bi-lightning-charge-fill',
-    'Sightseeing'  => 'bi-binoculars-fill',
-  ];
-  $categoryIcon = $categoryIcons[$activity->category] ?? 'bi-stars';
+  $categoryIcon = $activity->activityCategory->icon ?? 'bi-stars';
 @endphp
 <a href="{{ route('activities.show', $activity->slug) }}" class="text-decoration-none activity-card-link">
   <div class="activity-card">
     <div class="activity-card-img">
       <img src="{{ \App\Support\MediaUrl::resolve($activity->image) ?? 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?w=700&q=70' }}" alt="{{ $activity->name }}" loading="lazy">
-      @if($activity->category)
-        <span class="activity-badge-category"><i class="bi {{ $categoryIcon }}"></i> {{ $activity->category }}</span>
+      @if($activity->activityCategory)
+        <span class="activity-badge-category"><i class="bi {{ $categoryIcon }}"></i> {{ $activity->activityCategory->name }}</span>
       @endif
       <span class="activity-badge-price">{{ $activity->price ? '₹'.number_format($activity->price) : 'Included' }}</span>
     </div>

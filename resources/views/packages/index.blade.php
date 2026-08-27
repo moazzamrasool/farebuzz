@@ -207,32 +207,18 @@
   <div class="container">
     <h2 class="section-title text-center mb-4">Why Book With FareBuzzer</h2>
     <div class="row g-4">
-      <div class="col-6 col-md-3">
-        <div class="why-card">
-          <div class="why-icon" style="background:#dbeafe;color:var(--blue);"><i class="bi bi-shield-check"></i></div>
-          <h5>Best Price Guarantee</h5>
-          <p>Handpicked packages at the most competitive prices.</p>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
+      <div class="col-6 col-md-6">
         <div class="why-card">
           <div class="why-icon" style="background:#fef3c7;color:#c97500;"><i class="bi bi-headset"></i></div>
           <h5>24/7 Support</h5>
           <p>Our travel experts are always here to help.</p>
         </div>
       </div>
-      <div class="col-6 col-md-3">
+      <div class="col-6 col-md-6">
         <div class="why-card">
           <div class="why-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-award"></i></div>
           <h5>Curated Experiences</h5>
           <p>Every itinerary is designed by destination experts.</p>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="why-card">
-          <div class="why-icon" style="background:#f3e8ff;color:#7c3aed;"><i class="bi bi-people"></i></div>
-          <h5>Trusted by Travellers</h5>
-          <p>Thousands of happy travellers across India and abroad.</p>
         </div>
       </div>
     </div>

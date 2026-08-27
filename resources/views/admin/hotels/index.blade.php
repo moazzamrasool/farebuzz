@@ -26,6 +26,61 @@
                 </div>
               </div>
               <!-- /.card-header -->
+              <div class="card-body border-bottom">
+                <form method="GET" action="{{ route('crm.hotels.index') }}" class="form-row align-items-end">
+                  <div class="col-md-3 form-group mb-2">
+                    <label class="small text-muted mb-1">Search</label>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Name or address" class="form-control form-control-sm">
+                  </div>
+                  <div class="col-md-2 form-group mb-2">
+                    <label class="small text-muted mb-1">Destination</label>
+                    <select name="destination_id" class="form-control form-control-sm">
+                      <option value="">All Destinations</option>
+                      @foreach($destinations as $destination)
+                        <option value="{{ $destination->id }}" @selected((string) request('destination_id') === (string) $destination->id)>{{ $destination->name }}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                  <div class="col-md-1 form-group mb-2">
+                    <label class="small text-muted mb-1">Stars</label>
+                    <select name="star_rating" class="form-control form-control-sm">
+                      <option value="">Any</option>
+                      @for($i = 1; $i <= 5; $i++)
+                        <option value="{{ $i }}" @selected((string) request('star_rating') === (string) $i)>{{ $i }}★</option>
+                      @endfor
+                    </select>
+                  </div>
+                  <div class="col-md-2 form-group mb-2">
+                    <label class="small text-muted mb-1">Status</label>
+                    <select name="status" class="form-control form-control-sm">
+                      <option value="">All Statuses</option>
+                      <option value="active" @selected(request('status') === 'active')>Active</option>
+                      <option value="inactive" @selected(request('status') === 'inactive')>Inactive</option>
+                    </select>
+                  </div>
+                  <div class="col-md-1 form-group mb-2">
+                    <label class="small text-muted mb-1">Min Price</label>
+                    <input type="number" name="price_min" value="{{ request('price_min') }}" min="0" class="form-control form-control-sm">
+                  </div>
+                  <div class="col-md-1 form-group mb-2">
+                    <label class="small text-muted mb-1">Max Price</label>
+                    <input type="number" name="price_max" value="{{ request('price_max') }}" min="0" class="form-control form-control-sm">
+                  </div>
+                  <div class="col-md-2 form-group mb-2">
+                    <label class="small text-muted mb-1">Sort By</label>
+                    <select name="sort" class="form-control form-control-sm">
+                      <option value="" @selected(!request('sort'))>Recently Added</option>
+                      <option value="name_asc" @selected(request('sort') === 'name_asc')>Name A-Z</option>
+                      <option value="star_rating" @selected(request('sort') === 'star_rating')>Star Rating</option>
+                      <option value="price_low" @selected(request('sort') === 'price_low')>Price: Low to High</option>
+                    </select>
+                  </div>
+                  <div class="col-12 mt-1">
+                    <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                    <a href="{{ route('crm.hotels.index') }}" class="btn btn-secondary btn-sm">Clear</a>
+                  </div>
+                </form>
+              </div>
               <div class="card-body table-responsive p-0">
                 <table class="table table-hover text-nowrap">
                   <thead>
@@ -33,8 +88,11 @@
                       <th>SN.</th>
                       <th>Cover</th>
                       <th>Name</th>
+                      <th>Destination</th>
                       <th>Stars</th>
                       <th>Address</th>
+                      <th>Rooms</th>
+                      <th>From Price</th>
                       <th>Rating</th>
                       <th>Status</th>
                       <th>Actions</th>
@@ -52,8 +110,11 @@
                         @endif
                       </td>
                       <td>{{ $hotel->name }}</td>
+                      <td>{{ $hotel->destination?->name ?? 'N/A' }}</td>
                       <td>{{ $hotel->star_rating }}★</td>
                       <td>{{ $hotel->address ?? 'N/A' }}</td>
+                      <td>{{ $hotel->room_types_count }}</td>
+                      <td>{{ $hotel->min_price !== null ? '₹'.number_format($hotel->min_price) : 'N/A' }}</td>
                       <td>{{ $hotel->rating_score ?? 'N/A' }}</td>
                       <td>
                         <form action="{{ route('crm.hotels.toggle-status', $hotel->id) }}" method="POST" class="d-inline">
@@ -78,7 +139,7 @@
                     </tr>
                     @empty
                     <tr>
-                      <td colspan="8" class="text-center">No hotels found.</td>
+                      <td colspan="11" class="text-center">No hotels found matching your filters.</td>
                     </tr>
                     @endforelse
                   </tbody>

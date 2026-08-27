@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BedType;
 use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +17,7 @@ class Booking extends Model
     protected $fillable = [
         'holiday_package_id', 'booking_type', 'user_id', 'booking_reference',
         'package_title', 'package_slug', 'departure_city', 'travel_date',
-        'room_type_name', 'room_type_price', 'room_type_original_price', 'room_type_discount_percent', 'adults', 'children',
+        'room_type_name', 'room_type_price', 'room_type_original_price', 'room_type_discount_percent', 'room_type_bed_type', 'adults', 'children',
         'hotel_id', 'hotel_room_type_id', 'check_in_date', 'check_out_date', 'nights', 'rooms',
         'traveller_name', 'traveller_email', 'traveller_phone', 'traveller_address',
         'special_requests', 'gst_number',
@@ -31,6 +32,7 @@ class Booking extends Model
             'travel_date' => 'date',
             'check_in_date' => 'date',
             'check_out_date' => 'date',
+            'room_type_bed_type' => BedType::class,
         ];
     }
 

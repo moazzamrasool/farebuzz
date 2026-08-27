@@ -68,7 +68,7 @@
     $chips = [];
     if ($destId = request('destination_id')) { $chips['destination_id'] = 'Destination: '.($destinations->firstWhere('id', (int) $destId)->name ?? $destId); }
     elseif (request('destination')) { $chips['destination'] = 'Destination: '.request('destination'); }
-    if (request('category')) { $chips['category'] = 'Category: '.request('category'); }
+    if ($catId = request('activity_category_id')) { $chips['activity_category_id'] = 'Category: '.($categories->firstWhere('id', (int) $catId)->name ?? $catId); }
     if (request('price_min')) { $chips['price_min'] = 'Min ₹'.number_format((int) request('price_min')); }
     if (request('price_max')) { $chips['price_max'] = 'Max ₹'.number_format((int) request('price_max')); }
   @endphp
@@ -87,10 +87,10 @@
           </select>
 
           <h6>Category</h6>
-          <select name="category" class="form-select form-select-sm mb-2" onchange="this.form.submit()">
+          <select name="activity_category_id" class="form-select form-select-sm mb-2" onchange="this.form.submit()">
             <option value="">All Categories</option>
             @foreach($categories as $cat)
-              <option value="{{ $cat }}" {{ request('category') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+              <option value="{{ $cat->id }}" {{ (int) request('activity_category_id') === $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
             @endforeach
           </select>
 

@@ -32,6 +32,9 @@
         <h6 style="font-weight:800;font-size:13px;color:#888;text-transform:uppercase;">Stay Details</h6>
         <p class="mb-1"><strong>Hotel:</strong> {{ $booking->hotel->name ?? $booking->package_title }}</p>
         <p class="mb-1"><strong>Room Type:</strong> {{ $booking->room_type_name }}</p>
+        @if($booking->room_type_bed_type)
+          <p class="mb-1"><strong>Bed Type:</strong> {{ $booking->room_type_bed_type->label() }}</p>
+        @endif
         <p class="mb-1"><strong>Check-in:</strong> {{ $booking->check_in_date?->format('d M Y') }}</p>
         <p class="mb-1"><strong>Check-out:</strong> {{ $booking->check_out_date?->format('d M Y') }}</p>
         <p class="mb-1"><strong>Nights / Rooms:</strong> {{ $booking->nights }} &middot; {{ $booking->rooms }}</p>
@@ -77,7 +80,7 @@
     <table class="dash-table" style="max-width:420px;">
       @foreach($booking->hotels as $bookingHotel)
         <tr>
-          <td>{{ $bookingHotel->name }} <span class="text-muted">&times; {{ $bookingHotel->nights }} night(s)</span></td>
+          <td>{{ $bookingHotel->name }}@if($bookingHotel->bed_type) &middot; {{ $bookingHotel->bed_type->label() }}@endif <span class="text-muted">&times; {{ $bookingHotel->nights }} night(s)</span></td>
           <td style="text-align:right;">₹{{ number_format($bookingHotel->line_total, 2) }}</td>
         </tr>
       @endforeach

@@ -186,14 +186,17 @@ class BookingController extends Controller
                 $dayNumber = $hotel->pivot->day_number;
 
                 $booking->hotels()->create([
-                    'unique_id'  => $booking->unique_id,
-                    'hotel_id'   => $hotel->id,
-                    'name'       => $name,
-                    'unit_price' => $unitPrice,
-                    'nights'     => $nights,
-                    'line_total' => round($unitPrice * $nights, 2),
-                    'day_number' => $dayNumber,
-                    'stay_date'  => $dayNumber ? $travelDate->copy()->addDays($dayNumber - 1) : null,
+                    'unique_id'          => $booking->unique_id,
+                    'hotel_id'           => $hotel->id,
+                    'hotel_room_type_id' => $hotelRoomType?->id,
+                    'room_type_name'     => $hotelRoomType?->name,
+                    'bed_type'           => $hotelRoomType?->bed_type?->value,
+                    'name'               => $name,
+                    'unit_price'         => $unitPrice,
+                    'nights'             => $nights,
+                    'line_total'         => round($unitPrice * $nights, 2),
+                    'day_number'         => $dayNumber,
+                    'stay_date'          => $dayNumber ? $travelDate->copy()->addDays($dayNumber - 1) : null,
                 ]);
             }
 
@@ -303,6 +306,7 @@ class BookingController extends Controller
             'room_type_discount_percent' => $roomType->price > 0
                 ? (int) round((($roomType->price - $roomType->sellPrice) / $roomType->price) * 100)
                 : null,
+            'room_type_bed_type'         => $roomType->bed_type?->value,
             'children'                   => $data['children'] ?? 0,
             'status'                     => 'pending',
             'payment_status'             => 'pending',

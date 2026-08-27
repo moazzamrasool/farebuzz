@@ -129,6 +129,13 @@
                     {{ $hotel->name }} <span class="text-muted" style="font-weight:400;">({{ $hotel->star_rating }}★)</span>
                     @if($hotel->pivot->day_number)<span class="text-muted" style="font-weight:400;font-size:11px;"> · Day {{ $hotel->pivot->day_number }}</span>@endif
                   </div>
+                  @if($hotelRoomType)
+                    <div class="addon-check-note">
+                      {{ $hotelRoomType->name }}
+                      @if($hotelRoomType->bed_type) &middot; {{ $hotelRoomType->bed_type->label() }} @endif
+                      &middot; {{ $hotelRoomType->occupancy_adults }} Adult{{ $hotelRoomType->occupancy_adults > 1 ? 's' : '' }}{{ $hotelRoomType->occupancy_children ? ', '.$hotelRoomType->occupancy_children.' Child(ren)' : '' }}
+                    </div>
+                  @endif
                   @if($hotel->pivot->note)<div class="addon-check-note">{{ $hotel->pivot->note }}</div>@endif
                 </label>
                 <div class="addon-check-price">₹{{ number_format($hotelPricePerNight) }} <span class="text-muted" style="font-weight:400;font-size:10px;">/ night &times; {{ $hotelNights }}N</span></div>

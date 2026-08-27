@@ -16,7 +16,13 @@
   </div>
   <div class="form-group col-md-2">
     <label class="form-label-sm">Bed Type</label>
-    <input type="text" name="room_types[{{ $index }}][bed_type]" class="form-control" value="{{ $item->bed_type ?? '' }}" placeholder="e.g. King Bed">
+    <select name="room_types[{{ $index }}][bed_type]" class="form-control">
+      @php $bedType = $item->bed_type ?? null; @endphp
+      <option value="">— Select —</option>
+      @foreach(\App\Enums\BedType::options() as $value => $label)
+        <option value="{{ $value }}" {{ $bedType?->value === $value ? 'selected' : '' }}>{{ $label }}</option>
+      @endforeach
+    </select>
   </div>
   <div class="form-group col-md-1">
     <label class="form-label-sm">Size (sqft)</label>

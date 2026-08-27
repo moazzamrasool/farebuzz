@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BedType;
 use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,9 @@ class BookingHotel extends Model
     protected $fillable = [
         'booking_id',
         'hotel_id',
+        'hotel_room_type_id',
+        'room_type_name',
+        'bed_type',
         'name',
         'unit_price',
         'nights',
@@ -26,6 +30,7 @@ class BookingHotel extends Model
     {
         return [
             'stay_date' => 'date',
+            'bed_type' => BedType::class,
         ];
     }
 
@@ -37,5 +42,10 @@ class BookingHotel extends Model
     public function hotel(): BelongsTo
     {
         return $this->belongsTo(Hotel::class);
+    }
+
+    public function hotelRoomType(): BelongsTo
+    {
+        return $this->belongsTo(HotelRoomType::class);
     }
 }

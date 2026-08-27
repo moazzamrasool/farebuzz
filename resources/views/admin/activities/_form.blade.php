@@ -36,10 +36,17 @@
 
 <div class="form-row">
   <div class="form-group col-md-6">
-    <label for="category">Category</label>
-    <input type="text" name="category" id="category" placeholder="e.g. Adventure, Water Sports, Sightseeing"
-      class="form-control @error('category') is-invalid @enderror" value="{{ old('category', $activity->category ?? '') }}">
-    @error('category') <span class="text-danger">{{ $message }}</span> @enderror
+    <label for="activity_category_id">Category</label>
+    <select name="activity_category_id" id="activity_category_id" class="form-control @error('activity_category_id') is-invalid @enderror">
+      <option value="">None</option>
+      @foreach($activityCategories as $category)
+        <option value="{{ $category->id }}" {{ (int) old('activity_category_id', $activity->activity_category_id ?? '') === $category->id ? 'selected' : '' }}>
+          {{ $category->name }}
+        </option>
+      @endforeach
+      <option value="__add_new__">+ Add New Category</option>
+    </select>
+    @error('activity_category_id') <span class="text-danger">{{ $message }}</span> @enderror
   </div>
   <div class="form-group col-md-6">
     <label for="price">Price</label>
@@ -101,3 +108,5 @@
 
 <button type="submit" class="btn btn-primary">{{ isset($activity) ? 'Update' : 'Create' }} Activity</button>
 <a href="{{ route('crm.activities.index') }}" class="btn btn-secondary">Cancel</a>
+
+@include('admin.activity-categories._quick_add_modal')

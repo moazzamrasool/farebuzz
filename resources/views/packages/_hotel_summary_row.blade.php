@@ -26,6 +26,12 @@
         @for($i = 0; $i < $hotel->star_rating; $i++)<i class="bi bi-star-fill"></i>@endfor
       </div>
       <div class="summary-row-loc"><i class="bi bi-geo-alt-fill"></i> {{ $hotel->address }}</div>
+      @if($hotelRoomType)
+        <div class="summary-row-loc">
+          <i class="bi bi-door-open"></i> {{ $hotelRoomType->name }}
+          @if($hotelRoomType->bed_type) &middot; {{ $hotelRoomType->bed_type->label() }} @endif
+        </div>
+      @endif
     </div>
     @if($hotelIsOptional)
       <div class="summary-row-price">₹{{ number_format($hotelPricePerNight) }}<span class="per d-block">/ night &times; {{ $hotelNights }}N</span></div>

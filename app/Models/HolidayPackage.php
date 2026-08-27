@@ -23,7 +23,9 @@ class HolidayPackage extends Model
         'nights',
         'days',
         'hotel_category',
+        'hotel_category_overridden',
         'meals',
+        'meals_overridden',
         'language',
         'places_to_visit',
         'overview',
@@ -51,11 +53,117 @@ class HolidayPackage extends Model
     protected function casts(): array
     {
         return [
-            'featured'       => 'boolean',
-            'is_best_seller' => 'boolean',
-            'robots_index'   => 'boolean',
-            'robots_follow'  => 'boolean',
+            'featured'                   => 'boolean',
+            'is_best_seller'             => 'boolean',
+            'robots_index'               => 'boolean',
+            'robots_follow'              => 'boolean',
+            'hotel_category_overridden'  => 'boolean',
+            'meals_overridden'           => 'boolean',
         ];
+    }
+
+    private const MEAL_KEYS = ['breakfast', 'lunch', 'dinner'];
+
+    // Recomputes nights/days/hotel_category/meals from the itinerary and attached
+    // hotels, then saves. This is the single place that logic lives — call it after
+    // itinerary/hotel rows are synced (admin form save, bulk import) rather than from
+    // a model event, since those child rows are written in later steps of the same
+    // request/import and wouldn't exist yet if this ran on `saving`.
+    public function applyDerivedFields(): void
+    {
+        $this->load(['itineraries', 'hotels']);
+
+        $dayCount = $this->itineraries->count();
+        $this->days = $dayCount;
+        $this->nights = $dayCount > 0 ? $dayCount - 1 : 0;
+
+        if (!$this->hotel_category_overridden) {
+            $this->hotel_category = $this->deriveHotelCategory();
+        }
+
+        if (!$this->meals_overridden) {
+            $this->meals = $this->deriveMeals();
+        }
+
+        $this->save();
+    }
+
+    // Star ratings of every attached hotel, formatted as a range. Property-type
+    // annotations an admin might want (e.g. "+ Houseboat") aren't derivable from
+    // star rating alone — that's what the override exists for.
+    public function deriveHotelCategory(): ?string
+    {
+        $stars = $this->hotels->pluck('star_rating')
+            ->filter(fn ($rating) => $rating > 0)
+            ->unique()
+            ->sort()
+            ->values();
+
+        if ($stars->isEmpty()) {
+            return null;
+        }
+        if ($stars->count() === 1) {
+            return $stars->first().' Star Hotels';
+        }
+        if ($stars->count() === 2) {
+            return $stars->first().' & '.$stars->last().' Star Hotels';
+        }
+
+        return $stars->first().' to '.$stars->last().' Star Hotels';
+    }
+
+    // Day-by-day meal_tags on the itinerary, collapsed to a short phrase. Reads coarse
+    // ("Daily Breakfast + 1 Dinner") when breakfast covers every day, since that's how
+    // almost every package's meals actually look; falls back to explicit per-meal
+    // counts only when breakfast isn't on every day.
+    public function deriveMeals(): ?string
+    {
+        $dayCount = $this->itineraries->count();
+        $counts = array_fill_keys(self::MEAL_KEYS, 0);
+
+        foreach ($this->itineraries as $day) {
+            foreach ((array) ($day->meal_tags ?? []) as $tag) {
+                if (isset($counts[$tag])) {
+                    $counts[$tag]++;
+                }
+            }
+        }
+
+        if ($dayCount === 0 || array_sum($counts) === 0) {
+            return null;
+        }
+
+        $extras = [];
+        foreach (['lunch', 'dinner'] as $meal) {
+            if ($counts[$meal] > 0) {
+                $extras[] = $counts[$meal].' '.ucfirst($meal).($counts[$meal] > 1 ? 's' : '');
+            }
+        }
+
+        // A day-1 arrival with no breakfast tag (guests land and go straight to dinner)
+        // doesn't break "daily" breakfast — every other day still needs it counted to say so.
+        $firstDayHasBreakfast = in_array('breakfast', (array) ($this->itineraries->first()->meal_tags ?? []), true);
+        $expectedBreakfastDays = $firstDayHasBreakfast ? $dayCount : $dayCount - 1;
+
+        if ($expectedBreakfastDays > 0 && $counts['breakfast'] === $expectedBreakfastDays) {
+            if (empty($extras)) {
+                return 'Daily Breakfast';
+            }
+            if (count($extras) === 1) {
+                return 'Daily Breakfast + '.$extras[0];
+            }
+            $last = array_pop($extras);
+
+            return 'Daily Breakfast, '.implode(', ', $extras).' & '.$last;
+        }
+
+        $parts = [];
+        if ($counts['breakfast'] > 0) {
+            $parts[] = $counts['breakfast'].' Breakfast'.($counts['breakfast'] > 1 ? 's' : '');
+        }
+        $parts = array_merge($parts, $extras);
+
+        return $parts ? implode(', ', $parts) : null;
     }
 
     public function destination(): BelongsTo

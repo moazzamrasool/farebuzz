@@ -57,6 +57,9 @@
     <table class="info-table">
       <tr><td class="label">Hotel</td><td>{{ $booking->hotel->name ?? $booking->package_title }}</td></tr>
       <tr><td class="label">Room Type</td><td>{{ $booking->room_type_name }}</td></tr>
+      @if($booking->room_type_bed_type)
+        <tr><td class="label">Bed Type</td><td>{{ $booking->room_type_bed_type->label() }}</td></tr>
+      @endif
       <tr><td class="label">Check-in</td><td>{{ $booking->check_in_date?->format('d M Y') }}</td></tr>
       <tr><td class="label">Check-out</td><td>{{ $booking->check_out_date?->format('d M Y') }}</td></tr>
       <tr><td class="label">Nights / Rooms</td><td>{{ $booking->nights }} night(s) &middot; {{ $booking->rooms }} room(s)</td></tr>

@@ -45,6 +45,10 @@ class HolidayPackageController extends Controller
             $data['is_best_seller'] = $request->boolean('is_best_seller');
             $data['robots_index'] = $request->boolean('robots_index');
             $data['robots_follow'] = $request->boolean('robots_follow');
+            $data['hotel_category_overridden'] = $request->boolean('hotel_category_overridden');
+            $data['meals_overridden'] = $request->boolean('meals_overridden');
+            $data['nights'] = 0;
+            $data['days'] = 0;
             $data['slug'] = $this->generateUniqueSlug(HolidayPackage::class, $request->filled('slug') ? $request->slug : $request->title);
 
             if ($request->hasFile('og_image')) {
@@ -55,6 +59,7 @@ class HolidayPackageController extends Controller
 
             $package = HolidayPackage::create($data);
             $this->syncAllSections($request, $package);
+            $package->applyDerivedFields();
 
             return $package;
         });
@@ -86,6 +91,9 @@ class HolidayPackageController extends Controller
             $data['is_best_seller'] = $request->boolean('is_best_seller');
             $data['robots_index'] = $request->boolean('robots_index');
             $data['robots_follow'] = $request->boolean('robots_follow');
+            $data['hotel_category_overridden'] = $request->boolean('hotel_category_overridden');
+            $data['meals_overridden'] = $request->boolean('meals_overridden');
+            unset($data['nights'], $data['days']);
 
             if ($request->filled('slug') && $holidayPackage->slug !== $request->slug) {
                 $data['slug'] = $this->generateUniqueSlug(HolidayPackage::class, $request->slug, $holidayPackage->id);
@@ -104,6 +112,7 @@ class HolidayPackageController extends Controller
 
             $holidayPackage->update($data);
             $this->syncAllSections($request, $holidayPackage);
+            $holidayPackage->applyDerivedFields();
         });
 
         return redirect()->route('crm.holiday-packages.edit', $holidayPackage->id)
@@ -147,6 +156,14 @@ class HolidayPackageController extends Controller
 
         $import = new HolidayPackagesImport;
         Excel::import($import, $request->file('file'));
+
+        // Nights/Days/Hotel Category/Meals depend on itinerary + hotel rows that are
+        // written by later sheets in this same import, so they can only be derived once
+        // every sheet has run — not per-row inside PackageCoreSheetImport.
+        HolidayPackage::whereIn('id', $import->createdPackageIds())
+            ->with(['itineraries', 'hotels'])
+            ->get()
+            ->each(fn (HolidayPackage $package) => $package->applyDerivedFields());
 
         return $this->bulkImportResponse($import->importedCount(), $import->rowErrors());
     }
@@ -337,7 +354,7 @@ class HolidayPackageController extends Controller
             if (!empty($row['id'])) {
                 $photo = $package->photos()->find($row['id']);
                 if ($photo) {
-                    $attributes = ['is_cover' => $isCover, 'sort_order' => $index];
+                    $attributes = ['is_cover' => $isCover, 'sort_order' => $index, 'alt_text' => $row['alt_text'] ?? null];
 
                     if ($file) {
                         Storage::disk('public')->delete($photo->path);
@@ -353,6 +370,7 @@ class HolidayPackageController extends Controller
             if ($file) {
                 $photo = $package->photos()->create([
                     'path' => $file->store('holiday-packages/photos', 'public'),
+                    'alt_text' => $row['alt_text'] ?? null,
                     'is_cover' => $isCover,
                     'sort_order' => $index,
                 ]);

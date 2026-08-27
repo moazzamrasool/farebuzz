@@ -26,6 +26,22 @@
           @endforeach
         </div>
         @endif
+
+        @if(!empty($footerExtra['google_review_enabled']) && $hasUrl($footerExtra['google_review_url'] ?? null))
+        <div class="mt-4 pt-3" style="border-top:1px solid #1e3a5f;">
+          <h6 style="color:#fff;font-size:13px;font-weight:700;margin-bottom:6px;">Review us on Google</h6>
+          <p style="font-size:12px;color:#aaa;margin-bottom:10px;">Enjoyed your trip? Share your experience</p>
+          <div class="d-flex align-items-center gap-3 flex-wrap">
+            <img src="{{ \App\Support\GoogleReviewQr::forUrl($footerSection->unique_id ?? 'default', $footerExtra['google_review_url']) }}"
+                 alt="QR code to review {{ config('app.name') }} on Google"
+                 width="64" height="64" style="background:#fff;padding:4px;border-radius:6px;flex-shrink:0;">
+            <a href="{{ $footerExtra['google_review_url'] }}" target="_blank" rel="noopener"
+               style="background:#005fcc;color:#fff;font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;text-decoration:none;white-space:nowrap;">
+              Write a Review
+            </a>
+          </div>
+        </div>
+        @endif
       </div>
       <div class="col-6 col-md-2 footer-links">
         <h6>Company</h6>

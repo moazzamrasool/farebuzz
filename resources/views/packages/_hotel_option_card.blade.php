@@ -33,6 +33,13 @@
         </div>
       @endif
     </div>
+    @if($hotelIsOptional && $hotelRoomType)
+      <div style="font-size:12px;color:#555;margin-bottom:8px;">
+        <i class="bi bi-door-open"></i> {{ $hotelRoomType->name }}
+        @if($hotelRoomType->bed_type) &middot; {{ $hotelRoomType->bed_type->label() }} @endif
+        &middot; {{ $hotelRoomType->occupancy_adults }} Adult{{ $hotelRoomType->occupancy_adults > 1 ? 's' : '' }}{{ $hotelRoomType->occupancy_children ? ', '.$hotelRoomType->occupancy_children.' Child(ren)' : '' }}
+      </div>
+    @endif
     <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:12px;">{{ $hotel->description }}</p>
     <div class="d-flex flex-wrap">
       @foreach($hotel->amenities as $amenity)
@@ -45,7 +52,8 @@
       @endif
       <label class="addon-toggle mt-2">
         <input type="radio" class="hotel-addon-radio" name="{{ $radioGroup ?? 'hotel_addon_general' }}" value="{{ $hotel->id }}"
-          data-name="{{ $hotel->name }}" data-price="{{ number_format($hotelPricePerNight, 2, '.', '') }}" data-nights="{{ $hotelNights }}">
+          data-name="{{ $hotel->name }}" data-price="{{ number_format($hotelPricePerNight, 2, '.', '') }}" data-nights="{{ $hotelNights }}"
+          data-room-type-id="{{ $hotelRoomType?->id }}" data-room-type-name="{{ $hotelRoomType?->name }}" data-bed-type="{{ $hotelRoomType?->bed_type?->label() }}">
         <i class="bi bi-plus-circle"></i> Add
       </label>
     @endif

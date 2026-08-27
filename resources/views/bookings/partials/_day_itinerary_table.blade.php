@@ -31,7 +31,7 @@
       </tr>
       @foreach($dayHotels as $bookingHotel)
         <tr>
-          <td style="color:#555;padding:4px 8px;">Hotel: {{ $bookingHotel->name }} &times; {{ $bookingHotel->nights }} night(s)</td>
+          <td style="color:#555;padding:4px 8px;">Hotel: {{ $bookingHotel->name }}@if($bookingHotel->bed_type) &middot; {{ $bookingHotel->bed_type->label() }}@endif &times; {{ $bookingHotel->nights }} night(s)</td>
           <td align="right" style="padding:4px 8px;">₹{{ number_format($bookingHotel->line_total, 2) }}</td>
         </tr>
       @endforeach
@@ -51,7 +51,7 @@
       </tr>
       @foreach($generalHotels as $bookingHotel)
         <tr>
-          <td style="color:#555;padding:4px 8px;">Hotel: {{ $bookingHotel->name }} &times; {{ $bookingHotel->nights }} night(s)</td>
+          <td style="color:#555;padding:4px 8px;">Hotel: {{ $bookingHotel->name }}@if($bookingHotel->bed_type) &middot; {{ $bookingHotel->bed_type->label() }}@endif &times; {{ $bookingHotel->nights }} night(s)</td>
           <td align="right" style="padding:4px 8px;">₹{{ number_format($bookingHotel->line_total, 2) }}</td>
         </tr>
       @endforeach

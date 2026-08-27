@@ -12,6 +12,7 @@ use App\Models\Destination;
 use App\Models\Hotel;
 use App\Traits\GeneratesUniqueSlug;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -19,10 +20,35 @@ class HotelController extends Controller
 {
     use GeneratesUniqueSlug, HandlesBulkImportResponse;
 
-    public function index()
+    public function index(Request $request)
     {
-        $hotels = Hotel::with('amenities', 'destination')->orderBy('sort_order')->latest()->paginate(15);
-        return view('admin.hotels.index', compact('hotels'));
+        $hotels = Hotel::with('amenities', 'destination')
+            ->withCount('roomTypes')
+            ->withMin('roomTypes as min_price', DB::raw('COALESCE(discounted_price, price)'))
+            ->search($request->search)
+            ->destination($request->destination_id)
+            ->starRating($request->star_rating)
+            ->status($request->status)
+            ->priceBetween($request->price_min, $request->price_max);
+
+        switch ($request->sort) {
+            case 'name_asc':
+                $hotels->orderBy('name');
+                break;
+            case 'star_rating':
+                $hotels->orderByDesc('star_rating');
+                break;
+            case 'price_low':
+                $hotels->orderBy('min_price');
+                break;
+            default:
+                $hotels->orderBy('sort_order')->latest();
+        }
+
+        $hotels = $hotels->paginate(15)->withQueryString();
+        $destinations = Destination::where('status', 'active')->orderBy('name')->get();
+
+        return view('admin.hotels.index', compact('hotels', 'destinations'));
     }
 
     public function create()

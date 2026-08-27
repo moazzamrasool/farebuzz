@@ -1,0 +1,13 @@
+{
+  "name": "farebuzzer-itinerary-generator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reusable HTML/CSS -> PDF itinerary brochure generator for FareBuzzer",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "puppeteer-core": "^23.0.0",
+    "sharp": "^0.35.4"
+  }
+}

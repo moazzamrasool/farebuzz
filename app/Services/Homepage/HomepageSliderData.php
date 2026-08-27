@@ -41,7 +41,7 @@ class HomepageSliderData
     {
         return Activity::forSite()
             ->where('status', 'active')
-            ->with('destination')
+            ->with(['destination', 'activityCategory'])
             ->orderBy('sort_order')
             ->latest()
             ->take($limit)

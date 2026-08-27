@@ -30,7 +30,7 @@
         <h6 style="font-weight:800;font-size:13px;color:#888;text-transform:uppercase;margin-bottom:12px;">{{ $dayLabel }}</h6>
         <table class="dash-table" style="max-width:420px;">
           @foreach($dayHotels as $bookingHotel)
-            <tr><td>Hotel: {{ $bookingHotel->name }} <span class="text-muted">&times; {{ $bookingHotel->nights }} night(s)</span></td><td style="text-align:right;">₹{{ number_format($bookingHotel->line_total, 2) }}</td></tr>
+            <tr><td>Hotel: {{ $bookingHotel->name }}@if($bookingHotel->bed_type) &middot; {{ $bookingHotel->bed_type->label() }}@endif <span class="text-muted">&times; {{ $bookingHotel->nights }} night(s)</span></td><td style="text-align:right;">₹{{ number_format($bookingHotel->line_total, 2) }}</td></tr>
           @endforeach
           @foreach($dayActivities as $bookingActivity)
             <tr><td>Activity: {{ $bookingActivity->name }} <span class="text-muted">&times; {{ $bookingActivity->qty }}</span></td><td style="text-align:right;">₹{{ number_format($bookingActivity->line_total, 2) }}</td></tr>
@@ -42,7 +42,7 @@
       <table class="table table-sm">
         <tbody>
           @foreach($dayHotels as $bookingHotel)
-            <tr><td>Hotel: {{ $bookingHotel->name }}</td><td>{{ $bookingHotel->nights }} night(s)</td><td>₹{{ number_format($bookingHotel->line_total, 2) }}</td></tr>
+            <tr><td>Hotel: {{ $bookingHotel->name }}@if($bookingHotel->bed_type) &middot; {{ $bookingHotel->bed_type->label() }}@endif</td><td>{{ $bookingHotel->nights }} night(s)</td><td>₹{{ number_format($bookingHotel->line_total, 2) }}</td></tr>
           @endforeach
           @foreach($dayActivities as $bookingActivity)
             <tr><td>Activity: {{ $bookingActivity->name }}</td><td>{{ $bookingActivity->qty }} pax</td><td>₹{{ number_format($bookingActivity->line_total, 2) }}</td></tr>
@@ -58,7 +58,7 @@
         <h6 style="font-weight:800;font-size:13px;color:#888;text-transform:uppercase;margin-bottom:12px;">General Add-ons <span class="text-muted" style="text-transform:none;font-weight:400;">(not tied to a specific day)</span></h6>
         <table class="dash-table" style="max-width:420px;">
           @foreach($generalHotels as $bookingHotel)
-            <tr><td>Hotel: {{ $bookingHotel->name }} <span class="text-muted">&times; {{ $bookingHotel->nights }} night(s)</span></td><td style="text-align:right;">₹{{ number_format($bookingHotel->line_total, 2) }}</td></tr>
+            <tr><td>Hotel: {{ $bookingHotel->name }}@if($bookingHotel->bed_type) &middot; {{ $bookingHotel->bed_type->label() }}@endif <span class="text-muted">&times; {{ $bookingHotel->nights }} night(s)</span></td><td style="text-align:right;">₹{{ number_format($bookingHotel->line_total, 2) }}</td></tr>
           @endforeach
           @foreach($generalActivities as $bookingActivity)
             <tr><td>Activity: {{ $bookingActivity->name }} <span class="text-muted">&times; {{ $bookingActivity->qty }}</span></td><td style="text-align:right;">₹{{ number_format($bookingActivity->line_total, 2) }}</td></tr>
@@ -70,7 +70,7 @@
       <table class="table table-sm">
         <tbody>
           @foreach($generalHotels as $bookingHotel)
-            <tr><td>Hotel: {{ $bookingHotel->name }}</td><td>{{ $bookingHotel->nights }} night(s)</td><td>₹{{ number_format($bookingHotel->line_total, 2) }}</td></tr>
+            <tr><td>Hotel: {{ $bookingHotel->name }}@if($bookingHotel->bed_type) &middot; {{ $bookingHotel->bed_type->label() }}@endif</td><td>{{ $bookingHotel->nights }} night(s)</td><td>₹{{ number_format($bookingHotel->line_total, 2) }}</td></tr>
           @endforeach
           @foreach($generalActivities as $bookingActivity)
             <tr><td>Activity: {{ $bookingActivity->name }}</td><td>{{ $bookingActivity->qty }} pax</td><td>₹{{ number_format($bookingActivity->line_total, 2) }}</td></tr>
