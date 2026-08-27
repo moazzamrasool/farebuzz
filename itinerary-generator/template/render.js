@@ -429,6 +429,7 @@ function buildContactPage(brand, trip, imgMap, pageNum) {
   const c = brand.colors;
   return `
   <section class="page" style="background:${c.navy};">
+    <div class="brand-logo" style="background:#fff; padding:8px 12px; border-radius:10px; z-index:6;"><img src="${imgMap.__logo}" alt="logo" /></div>
     ${img(imgMap, 'kathmandu_durbar', 'position:absolute;inset:0;width:100%;height:100%;opacity:.22;border-radius:0;')}
     <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(11,37,69,.65), rgba(11,37,69,.95));"></div>
 
