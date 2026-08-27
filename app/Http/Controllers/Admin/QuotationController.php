@@ -28,23 +28,37 @@ class QuotationController extends Controller
         return view('admin.quotations.create', ['enquiry' => $packageEnquiry]);
     }
 
+    private const STORE_RULES = [
+        'customer_name'  => 'required|string|max:255',
+        'customer_email' => 'required|email',
+        'customer_phone' => 'nullable|string|max:30',
+        'valid_until'    => 'nullable|date',
+        'notes'          => 'nullable|string',
+        'items'                => 'required|array|min:1',
+        'items.*.description'  => 'required|string|max:255',
+        'items.*.quantity'     => 'required|integer|min:1',
+        'items.*.unit_price'   => 'required|numeric',
+    ];
+
+    // Renders the exact same PDF "Send Quotation" would email — from the
+    // currently-entered form fields, without saving anything — so staff can
+    // check it before committing to a quotation number and sending it.
+    public function previewDraft(Request $request, PackageEnquiry $packageEnquiry, QuotationService $quotations)
+    {
+        $this->authorizeVisibility($packageEnquiry);
+
+        $data = $request->validate(self::STORE_RULES);
+
+        return $quotations->previewDraft($data, $packageEnquiry);
+    }
+
     // One button both saves the quotation and emails it to the customer — there's
     // no separate draft/send step.
     public function store(Request $request, PackageEnquiry $packageEnquiry, QuotationService $quotations)
     {
         $this->authorizeVisibility($packageEnquiry);
 
-        $data = $request->validate([
-            'customer_name'  => 'required|string|max:255',
-            'customer_email' => 'required|email',
-            'customer_phone' => 'nullable|string|max:30',
-            'valid_until'    => 'nullable|date',
-            'notes'          => 'nullable|string',
-            'items'                  => 'required|array|min:1',
-            'items.*.description'   => 'required|string|max:255',
-            'items.*.quantity'      => 'required|integer|min:1',
-            'items.*.unit_price'    => 'required|numeric',
-        ]);
+        $data = $request->validate(self::STORE_RULES);
 
         $items = collect($data['items'])->values()->map(function ($item, $index) {
             return [
@@ -102,5 +116,11 @@ class QuotationController extends Controller
     public function download(Quotation $quotation, QuotationService $quotations)
     {
         return $quotations->download($quotation);
+    }
+
+    // Renders the exact same PDF "Download PDF" produces, inline in the browser.
+    public function preview(Quotation $quotation, QuotationService $quotations)
+    {
+        return $quotations->preview($quotation);
     }
 }

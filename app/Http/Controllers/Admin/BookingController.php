@@ -50,6 +50,13 @@ class BookingController extends Controller
         return $itineraries->downloadForBooking($booking);
     }
 
+    // Renders the exact same PDF the "Send Itinerary to Customer" button below
+    // would email, inline in the browser, so staff can check it before sending.
+    public function previewItinerary(Booking $booking, ItineraryService $itineraries)
+    {
+        return $itineraries->previewForBooking($booking);
+    }
+
     public function sendItinerary(Booking $booking)
     {
         abort_unless($booking->user?->email, 404, 'This booking has no customer email on file.');

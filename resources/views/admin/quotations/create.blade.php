@@ -98,7 +98,8 @@
 
                 </div>
                 <div class="card-footer">
-                  <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send Quotation</button>
+                  <button type="submit" formaction="{{ route('crm.quotations.preview-draft', $enquiry) }}" formtarget="_blank" class="btn btn-outline-secondary"><i class="fas fa-eye"></i> Preview</button>
+                  <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Confirm &amp; Send Quotation</button>
                 </div>
               </form>
             </div>

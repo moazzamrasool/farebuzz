@@ -12,6 +12,7 @@
                 <h3 class="card-title">Quotation {{ $quotation->quotation_number }}</h3>
                 <div class="card-tools">
                   <a href="{{ route('crm.quotations.download', $quotation) }}" class="btn btn-outline-primary btn-sm"><i class="fas fa-download"></i> Download PDF</a>
+                  <a href="{{ route('crm.quotations.preview', $quotation) }}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="fas fa-eye"></i> Preview</a>
                   @if($quotation->packageEnquiry)
                     <a href="{{ route('crm.package-enquiries.show', $quotation->packageEnquiry) }}" class="btn btn-secondary btn-sm">&larr; Back to Lead</a>
                   @endif

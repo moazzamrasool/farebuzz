@@ -83,6 +83,17 @@ class PackageEnquiryController extends Controller
         return back()->with('success', 'Lead status updated.');
     }
 
+    // Renders the exact same PDF the "Send Itinerary" button below would email,
+    // inline in the browser, so staff can check it before sending.
+    public function previewItinerary(PackageEnquiry $packageEnquiry, ItineraryService $itineraries)
+    {
+        $this->authorizeVisibility($packageEnquiry);
+
+        abort_unless($itineraries->availableForLead($packageEnquiry), 404, 'No itinerary is available for this enquiry\'s package.');
+
+        return $itineraries->previewForLead($packageEnquiry);
+    }
+
     public function sendItinerary(PackageEnquiry $packageEnquiry, ItineraryService $itineraries)
     {
         $this->authorizeVisibility($packageEnquiry);

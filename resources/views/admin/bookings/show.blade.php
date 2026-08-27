@@ -28,6 +28,7 @@
                   <a href="{{ route('crm.bookings.invoice', $booking) }}" class="btn btn-outline-primary btn-sm"><i class="fas fa-download"></i> Invoice PDF</a>
                   @if($hasItinerary)
                     <a href="{{ route('crm.bookings.itinerary', $booking) }}" class="btn btn-outline-primary btn-sm"><i class="fas fa-map"></i> Itinerary PDF</a>
+                    <a href="{{ route('crm.bookings.itinerary.preview', $booking) }}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="fas fa-eye"></i> Preview</a>
                     @if($booking->user?->email)
                       <form action="{{ route('crm.bookings.send-itinerary', $booking) }}" method="POST" class="d-inline">
                         @csrf

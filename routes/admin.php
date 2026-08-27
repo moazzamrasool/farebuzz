@@ -153,6 +153,7 @@ Route::prefix('crm')->group(function () {
                 Route::get('bookings/{booking}', [AdminBookingController::class, 'show'])->name('crm.bookings.show');
                 Route::get('bookings/{booking}/invoice', [AdminBookingController::class, 'invoice'])->name('crm.bookings.invoice');
                 Route::get('bookings/{booking}/itinerary', [AdminBookingController::class, 'itinerary'])->name('crm.bookings.itinerary');
+                Route::get('bookings/{booking}/itinerary/preview', [AdminBookingController::class, 'previewItinerary'])->name('crm.bookings.itinerary.preview');
             });
             Route::middleware('admin.permission:bookings.edit')->post('bookings/{booking}/send-itinerary', [AdminBookingController::class, 'sendItinerary'])->name('crm.bookings.send-itinerary');
             // "Payment succeeded but our callback never arrived" recovery path — asks PayU
@@ -342,8 +343,11 @@ Route::prefix('crm')->group(function () {
 
             // Quotations — dedicated page per lead, viewing/downloading a past quote
             Route::get('package-enquiries/{packageEnquiry}/quotations/create', [QuotationController::class, 'create'])->name('crm.quotations.create');
+            Route::post('package-enquiries/{packageEnquiry}/quotations/preview', [QuotationController::class, 'previewDraft'])->name('crm.quotations.preview-draft');
             Route::get('quotations/{quotation}', [QuotationController::class, 'show'])->name('crm.quotations.show');
             Route::get('quotations/{quotation}/download', [QuotationController::class, 'download'])->name('crm.quotations.download');
+            Route::get('quotations/{quotation}/preview', [QuotationController::class, 'preview'])->name('crm.quotations.preview');
+            Route::get('package-enquiries/{packageEnquiry}/itinerary/preview', [PackageEnquiryController::class, 'previewItinerary'])->name('crm.package-enquiries.itinerary.preview');
         });
 
         Route::middleware('admin.permission:leads.edit')->group(function () {

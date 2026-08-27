@@ -63,6 +63,7 @@
                     <button type="button" class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#whatsappModal"><i class="fab fa-whatsapp"></i> Send WhatsApp</button>
                     <button type="button" class="btn btn-outline-info btn-sm" data-toggle="modal" data-target="#emailModal"><i class="fas fa-envelope"></i> Send Email</button>
                     @if($hasItinerary)
+                      <a href="{{ route('crm.package-enquiries.itinerary.preview', $enquiry) }}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="fas fa-eye"></i> Preview Itinerary</a>
                       <form action="{{ route('crm.package-enquiries.itinerary.send', $enquiry) }}" method="POST" class="d-inline">
                         @csrf
                         <button type="submit" class="btn btn-outline-info btn-sm"><i class="fas fa-map"></i> Send Itinerary</button>
