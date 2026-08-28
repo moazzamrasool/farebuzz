@@ -9,19 +9,19 @@ use Illuminate\Support\Collection;
 // Builds the view-model the premium PDF templates (resources/views/pdf/premium/*)
 // render from — every image slot resolved up front via PdfImage::resolve() so the
 // templates only ever deal with "a local path, or null" and never need their own
-// missing-image handling. Per-day images aren't a stored field (PackageItinerary
-// has none); the day's hero is assigned round-robin from the package's own
-// photos() pool, and its 1-2 supporting images prefer whatever activity/hotel is
-// actually linked to that day_number (same pivot the admin itinerary form already
-// reads — see holiday-packages/partials/_itinerary_row.blade.php), backfilling
-// from the photo pool when nothing is linked, so the brochure is always populated
-// purely from data every package already has.
+// missing-image handling. When a day has its own uploaded images (admin's "Day
+// Images" repeater), those are used directly — first as the hero, up to 2 more as
+// supporting tiles — capped at 3 total to fit the existing fixed-height A4 layout
+// and avoid bloating the PDF with every uploaded image. Days with no images of
+// their own fall back to the original scheme: hero assigned round-robin from the
+// package's own photos() pool, supporting images preferring whatever
+// activity/hotel is linked to that day_number, backfilled from the photo pool.
 class PremiumItineraryPresenter
 {
     public function present(HolidayPackage $package, array $meta = []): array
     {
         $package->loadMissing([
-            'itineraries', 'photos', 'destination', 'hotels', 'optionalActivities',
+            'itineraries.images', 'photos', 'destination', 'hotels', 'optionalActivities',
             'inclusionFeatures', 'exclusionFeatures', 'customInclusions', 'customExclusions',
         ]);
 
@@ -34,8 +34,20 @@ class PremiumItineraryPresenter
         $hotelsByDay = $package->hotels->groupBy('pivot.day_number');
 
         $days = $package->itineraries->values()->map(function ($day, $index) use ($photos, $destinationCover, $activitiesByDay, $hotelsByDay) {
-            $photo = $photos->isNotEmpty() ? $photos[$index % $photos->count()] : null;
-            $heroImage = PdfImage::resolve($photo?->path ?? $destinationCover);
+            $ownImages = $day->images->map(fn ($img) => PdfImage::resolve($img->image))->filter()->values();
+
+            if ($ownImages->isNotEmpty()) {
+                $heroImage = $ownImages->first();
+                $supportingImages = $ownImages->slice(1, 2)->values()->all();
+            } else {
+                $photo = $photos->isNotEmpty() ? $photos[$index % $photos->count()] : null;
+                $heroImage = PdfImage::resolve($photo?->path ?? $destinationCover);
+                $supportingImages = $this->supportingImagesForDay(
+                    $day->day_number, $index, $heroImage, $photos,
+                    $activitiesByDay->get($day->day_number, collect()),
+                    $hotelsByDay->get($day->day_number, collect())
+                );
+            }
 
             return [
                 'day_number'         => $day->day_number,
@@ -45,11 +57,7 @@ class PremiumItineraryPresenter
                 'bullet_points'      => $day->bullet_points ?? [],
                 'meal_tags'          => $day->meal_tags ?? [],
                 'image'              => $heroImage,
-                'supporting_images'  => $this->supportingImagesForDay(
-                    $day->day_number, $index, $heroImage, $photos,
-                    $activitiesByDay->get($day->day_number, collect()),
-                    $hotelsByDay->get($day->day_number, collect())
-                ),
+                'supporting_images'  => $supportingImages,
             ];
         })->all();
 

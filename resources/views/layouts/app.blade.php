@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 @include('layouts.head')
-<body>
+<body class="@yield('body_class')">
 @include('layouts.partials.tracking_body_open')
 
 <!-- ══════════ NAVBAR ══════════ -->
@@ -12,6 +12,7 @@
 
 @include('layouts.footer')
 @include('layouts.partials.floating_buttons')
+@include('layouts.partials.sticky_contact_bar')
 @include('layouts.partials.tawkto')
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{asset('frontend/asset/js/custom.js')}}"></script>

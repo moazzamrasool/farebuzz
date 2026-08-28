@@ -13,6 +13,11 @@
       .fb-floating-actions { left: 14px; bottom: 14px; }
       .fb-floating-btn { width: 48px; height: 48px; font-size: 20px; }
     }
+    /* Below md, the full-width sticky bottom bar (sticky_contact_bar.blade.php) replaces
+       these floating circles — showing both would double up and crowd the viewport. */
+    @media (max-width: 767.98px) {
+      .fb-floating-actions { display: none; }
+    }
   </style>
   <div class="fb-floating-actions">
     @if(config('app.contact_whatsapp'))

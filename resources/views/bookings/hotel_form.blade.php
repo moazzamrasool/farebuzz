@@ -2,6 +2,9 @@
 
 @section('title', 'Book '.$hotel->name.' – FareBuzzer')
 @section('robots', 'noindex, follow')
+{{-- Keeps the mobile sticky Call/WhatsApp bar off the payment form so it can't
+     sit near — or get mistapped for — the "Proceed to Pay" button. --}}
+@section('body_class', 'hide-sticky-contact-bar')
 
 @push('styles')
 <style>

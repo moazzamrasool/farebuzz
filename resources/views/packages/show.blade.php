@@ -95,8 +95,6 @@
   .sec-title { font-size:20px; font-weight:800; color:#111; margin-bottom:16px; }
   .section-divider { border:none; border-top:1px solid #eee; margin:32px 0; }
 
-  .highlight-pill { background:#f0f6ff; color:var(--blue); border-radius:20px; padding:6px 16px; font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:6px; }
-
   .incl-item { display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; font-size:13px; }
   .incl-item i { margin-top:2px; flex-shrink:0; }
 
@@ -113,6 +111,11 @@
   .itin-body ul li { font-size:13px; color:#444; margin-bottom:6px; }
   .itin-meal-tags { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
   .meal-tag { background:#dcfce7; color:#16a34a; border-radius:12px; padding:3px 10px; font-size:11px; font-weight:600; }
+  .itin-img-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-top:12px; }
+  .itin-img-tile { position:relative; border-radius:8px; overflow:hidden; aspect-ratio:4/3; background:#f2f2f2; }
+  .itin-img-tile img { width:100%; height:100%; object-fit:cover; display:block; max-width:100%; }
+  .itin-img-caption { position:absolute; left:0; right:0; bottom:0; background:linear-gradient(transparent, rgba(0,0,0,.6)); color:#fff; font-size:10px; padding:10px 8px 5px; }
+  @media(max-width:576px) { .itin-img-grid { grid-template-columns:repeat(2, 1fr); } }
   .itin-date-badge { font-weight:700; color:var(--blue); }
   .itin-date-badge:not(:empty)::before { content:"·"; margin:0 6px; color:#ccc; }
   .itin-day-subhead { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:#888; margin:16px 0 10px; }
@@ -130,6 +133,7 @@
   .review-date { font-size:11px; color:#aaa; }
 
   .booking-sidebar { background:#fff; border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,0.1); padding:28px 24px; position:sticky; top:20px; }
+  .book-price-block .from-label { font-size:11px; color:#888; text-transform:uppercase; letter-spacing:.5px; margin-bottom:2px; }
   .book-price-block .orig { font-size:14px; color:#aaa; text-decoration:line-through; }
   .book-price-block .curr { font-size:32px; font-weight:800; color:var(--blue); line-height:1.1; }
   .book-price-block .per { font-size:12px; color:#888; }
@@ -145,8 +149,13 @@
   .travel-date-hint { font-size:11px; color:#b45309; margin-top:6px; display:flex; align-items:center; gap:5px; }
   .btn-book-main { background:var(--blue); color:#fff; border:none; border-radius:10px; font-size:15px; font-weight:700; padding:14px; width:100%; cursor:pointer; transition:background .2s; }
   .btn-book-main:hover { background:#004bb5; }
-  .btn-enquire { background:#fff; color:var(--blue); border:2px solid var(--blue); border-radius:10px; font-size:14px; font-weight:700; padding:11px; width:100%; cursor:pointer; transition:background .2s; margin-top:10px; }
-  .btn-enquire:hover { background:#f0f6ff; }
+  .btn-enquire { background:#fff; color:var(--blue); border:2px solid var(--blue); border-radius:10px; font-size:14px; font-weight:700; padding:11px; width:100%; cursor:pointer; transition:background .2s; display:flex; align-items:center; justify-content:center; gap:6px; text-decoration:none; }
+  .btn-enquire:hover, .btn-enquire:focus { background:#f0f6ff; color:var(--blue); text-decoration:none; }
+  .sidebar-btn-row { display:flex; gap:10px; margin-top:10px; }
+  .sidebar-btn-row .btn-enquire { flex:1 1 0; }
+  @media (max-width:400px) {
+    .sidebar-btn-row { flex-direction:column; }
+  }
   .trust-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; }
   .trust-item { display:flex; align-items:center; gap:5px; font-size:11px; color:#666; }
   .trust-item i { color:#16a34a; }
@@ -262,13 +271,6 @@
       <div id="overview">
         <h2 class="sec-title">Overview</h2>
         <div class="rich-text-content ck-content" style="font-size:14px;color:#444;line-height:1.7;">{!! $package->overview !!}</div>
-        @if($package->activities->isNotEmpty())
-          <div class="d-flex flex-wrap gap-2 mt-3 mb-3">
-            @foreach($package->activities as $activity)
-              <span class="highlight-pill"><i class="bi bi-check2"></i> {{ $activity->name }}</span>
-            @endforeach
-          </div>
-        @endif
         @if($package->places_to_visit)
           <div class="overview-box mt-1"><i class="bi bi-signpost-split d-block"></i><div class="ov-label">Places to Visit</div><div class="ov-val">{{ $package->places_to_visit }}</div></div>
         @endif
@@ -322,6 +324,19 @@
                   <div class="itin-meal-tags">
                     @foreach($day->meal_tags as $meal)
                       <span class="meal-tag"><i class="bi bi-cup-hot-fill me-1"></i>{{ $meal }}</span>
+                    @endforeach
+                  </div>
+                @endif
+
+                @if($day->images->isNotEmpty())
+                  <div class="itin-img-grid">
+                    @foreach($day->images as $image)
+                      <div class="itin-img-tile">
+                        <img src="{{ asset('storage/'.$image->image) }}" alt="{{ $image->alt_text ?: $day->title }}" loading="lazy">
+                        @if($image->caption)
+                          <span class="itin-img-caption">{{ $image->caption }}</span>
+                        @endif
+                      </div>
                     @endforeach
                   </div>
                 @endif
@@ -440,6 +455,7 @@
           $displaySavings = $displaySell < $displayOriginal ? (int) round((($displayOriginal - $displaySell) / $displayOriginal) * 100) : null;
         @endphp
         <div class="book-price-block mb-3" id="pkg-price-block">
+          <div class="from-label">Starting from</div>
           @if($displaySavings)
             <div class="orig">₹{{ number_format($displayOriginal) }}</div>
             <div class="curr">₹{{ number_format($displaySell) }} <span class="per">/ person</span></div>
@@ -492,7 +508,14 @@
         @if($package->booking_type === 'book_enquiry')
           <button type="button" class="btn-book-main mt-2" id="btn-book-now">Book Now</button>
         @endif
-        <button type="button" class="btn-enquire" id="btn-enquire-now">Enquire Now</button>
+        <div class="sidebar-btn-row">
+          <button type="button" class="btn-enquire" id="btn-enquire-now">Enquire Now</button>
+          @if(config('app.contact_phone'))
+            <a href="tel:{{ config('app.contact_phone') }}" class="btn-enquire" id="btn-call-now">
+              <i class="bi bi-telephone-fill"></i> Call Now
+            </a>
+          @endif
+        </div>
         <div class="trust-row">
           <span class="trust-item"><i class="bi bi-shield-check"></i> Secure Booking</span>
         </div>

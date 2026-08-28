@@ -3,6 +3,7 @@
 namespace App\Imports\HolidayPackages;
 
 use App\Imports\Concerns\CollectsRowErrors;
+use App\Imports\Concerns\ResolvesImportValues;
 use App\Models\HolidayPackage;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 // here can already be looked up by a plain tenant-scoped query.
 class PackageItinerarySheetImport implements ToCollection, WithChunkReading, WithHeadingRow
 {
-    use CollectsRowErrors;
+    use CollectsRowErrors, ResolvesImportValues;
 
     private const VALID_MEAL_TAGS = ['breakfast', 'lunch', 'dinner'];
 
@@ -42,6 +43,7 @@ class PackageItinerarySheetImport implements ToCollection, WithChunkReading, Wit
                 'detail' => 'nullable|string',
                 'bullet_points' => 'nullable|string',
                 'meal_tags' => 'nullable|string',
+                'image_urls' => 'nullable|string',
             ]);
 
             if ($validator->fails()) {
@@ -77,11 +79,21 @@ class PackageItinerarySheetImport implements ToCollection, WithChunkReading, Wit
                 ->values()
                 ->all();
 
+            // Downloaded outside the transaction (network I/O shouldn't hold a DB
+            // transaction open) — a URL that fails to download is just skipped,
+            // matching downloadImage()'s best-effort/never-throws contract.
+            $imagePaths = collect(explode(',', (string) ($data['image_urls'] ?? '')))
+                ->map(fn ($url) => trim($url))
+                ->filter()
+                ->map(fn ($url) => $this->downloadImage($url, 'holiday-packages/itinerary-images'))
+                ->filter()
+                ->values();
+
             try {
-                DB::transaction(function () use ($package, $data, $bulletPoints, $mealTags) {
+                DB::transaction(function () use ($package, $data, $bulletPoints, $mealTags, $imagePaths) {
                     $dayNumber = (int) $data['day_number'];
 
-                    $package->itineraries()->create([
+                    $itinerary = $package->itineraries()->create([
                         'day_number' => $dayNumber,
                         'title' => trim($data['day_title']),
                         'route_summary' => $this->nullableString($data['route_summary'] ?? null),
@@ -90,6 +102,13 @@ class PackageItinerarySheetImport implements ToCollection, WithChunkReading, Wit
                         'meal_tags' => $mealTags->values()->all(),
                         'sort_order' => $dayNumber - 1,
                     ]);
+
+                    foreach ($imagePaths as $sortOrder => $path) {
+                        $itinerary->images()->create([
+                            'image' => $path,
+                            'sort_order' => $sortOrder,
+                        ]);
+                    }
                 });
 
                 $this->markImported();

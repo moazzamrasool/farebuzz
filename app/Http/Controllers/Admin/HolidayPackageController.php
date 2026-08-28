@@ -12,6 +12,7 @@ use App\Models\Destination;
 use App\Models\Hotel;
 use App\Models\HolidayPackage;
 use App\Models\PackageFeature;
+use App\Models\PackageItinerary;
 use App\Models\TravelCategory;
 use App\Traits\GeneratesUniqueSlug;
 use Illuminate\Http\Request;
@@ -72,7 +73,7 @@ class HolidayPackageController extends Controller
     {
         $holidayPackage->load([
             'categories', 'activities', 'optionalActivities', 'inclusionFeatures', 'exclusionFeatures',
-            'customInclusions', 'customExclusions', 'hotels', 'itineraries',
+            'customInclusions', 'customExclusions', 'hotels', 'itineraries.images',
             'photos', 'faqs', 'reviews', 'departureCities', 'roomTypes', 'relatedPackages',
         ]);
 
@@ -197,7 +198,6 @@ class HolidayPackageController extends Controller
     private function syncAllSections(HolidayPackageRequest $request, HolidayPackage $package): void
     {
         $package->categories()->sync($request->input('category_ids', []));
-        $package->activities()->sync($request->input('activity_ids', []));
         $package->relatedPackages()->sync($request->input('related_ids', []));
 
         $this->syncFeatures($request, $package);
@@ -261,9 +261,12 @@ class HolidayPackageController extends Controller
         }
     }
 
+    // Upsert-by-id (mirrors syncPhotos()) rather than delete-and-recreate: itinerary
+    // rows must keep a stable id across saves so their day-images (FK'd to
+    // package_itinerary_id, cascadeOnDelete) aren't wiped out on every "Update".
     private function syncItineraries(HolidayPackageRequest $request, HolidayPackage $package): void
     {
-        $package->itineraries()->delete();
+        $keepIds = [];
 
         foreach ($request->input('itineraries', []) as $index => $row) {
             if (empty($row['title'])) continue;
@@ -274,7 +277,7 @@ class HolidayPackageController extends Controller
                 ->values()
                 ->all();
 
-            $package->itineraries()->create([
+            $attributes = [
                 'day_number'    => $row['day_number'] ?? ($index + 1),
                 'title'         => $row['title'],
                 'route_summary' => $row['route_summary'] ?? null,
@@ -282,7 +285,70 @@ class HolidayPackageController extends Controller
                 'bullet_points' => $bulletPoints,
                 'meal_tags'     => $row['meal_tags'] ?? [],
                 'sort_order'    => $index,
-            ]);
+            ];
+
+            $itinerary = !empty($row['id']) ? $package->itineraries()->find($row['id']) : null;
+            if ($itinerary) {
+                $itinerary->update($attributes);
+            } else {
+                $itinerary = $package->itineraries()->create($attributes);
+            }
+
+            $keepIds[] = $itinerary->id;
+            $this->syncItineraryImages($request, $itinerary, $index);
+        }
+
+        $removed = $package->itineraries()->whereNotIn('id', $keepIds)->get();
+        foreach ($removed as $itinerary) {
+            foreach ($itinerary->images as $image) {
+                Storage::disk('public')->delete($image->image);
+            }
+            $itinerary->delete();
+        }
+    }
+
+    private function syncItineraryImages(HolidayPackageRequest $request, PackageItinerary $itinerary, int $dayIndex): void
+    {
+        $rows = $request->input("itineraries.$dayIndex.images", []);
+        $files = $request->file("itineraries.$dayIndex.images", []);
+        $keepIds = [];
+
+        foreach ($rows as $imgIndex => $row) {
+            $file = $files[$imgIndex]['file'] ?? null;
+
+            if (!empty($row['id'])) {
+                $image = $itinerary->images()->find($row['id']);
+                if ($image) {
+                    $attributes = [
+                        'caption'    => $row['caption'] ?? null,
+                        'alt_text'   => $row['alt_text'] ?? null,
+                        'sort_order' => $imgIndex,
+                    ];
+                    if ($file) {
+                        Storage::disk('public')->delete($image->image);
+                        $attributes['image'] = $file->store('holiday-packages/itinerary-images', 'public');
+                    }
+                    $image->update($attributes);
+                    $keepIds[] = $image->id;
+                }
+                continue;
+            }
+
+            if ($file) {
+                $image = $itinerary->images()->create([
+                    'image'      => $file->store('holiday-packages/itinerary-images', 'public'),
+                    'caption'    => $row['caption'] ?? null,
+                    'alt_text'   => $row['alt_text'] ?? null,
+                    'sort_order' => $imgIndex,
+                ]);
+                $keepIds[] = $image->id;
+            }
+        }
+
+        $removed = $itinerary->images()->whereNotIn('id', $keepIds)->get();
+        foreach ($removed as $image) {
+            Storage::disk('public')->delete($image->image);
+            $image->delete();
         }
     }
 

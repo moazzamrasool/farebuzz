@@ -10,7 +10,7 @@ class ItineraryTemplateSheet implements FromArray, WithHeadings, WithTitle
 {
     public function headings(): array
     {
-        return ['package_title', 'day_number', 'day_title', 'route_summary', 'detail', 'bullet_points', 'meal_tags'];
+        return ['package_title', 'day_number', 'day_title', 'route_summary', 'detail', 'bullet_points', 'meal_tags', 'image_urls'];
     }
 
     public function array(): array
@@ -21,12 +21,14 @@ class ItineraryTemplateSheet implements FromArray, WithHeadings, WithTitle
                 'Arrive in Goa, transfer to your hotel and spend the evening relaxing on Baga Beach.',
                 'Airport pickup included;Welcome drink on arrival;Evening free for leisure',
                 'dinner',
+                'https://example.com/goa-arrival-1.jpg,https://example.com/goa-arrival-2.jpg',
             ],
             [
                 'Magical Goa Getaway', 2, 'Old Goa Heritage Tour', 'Baga to Old Goa',
                 'Visit the UNESCO-listed churches of Old Goa followed by a spice plantation tour.',
                 'Guided church tour;Spice plantation lunch included',
                 'breakfast,lunch',
+                '',
             ],
         ];
     }

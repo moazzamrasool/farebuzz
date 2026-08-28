@@ -2,7 +2,6 @@
 @php
   $hp = $holidayPackage ?? null;
   $selectedCategoryIds = old('category_ids', $hp ? $hp->categories->pluck('id')->all() : []);
-  $selectedActivityIds = old('activity_ids', $hp ? $hp->activities->pluck('id')->all() : []);
   $selectedInclusionIds = old('inclusion_feature_ids', $hp ? $hp->inclusionFeatures->pluck('id')->all() : []);
   $selectedExclusionIds = old('exclusion_feature_ids', $hp ? $hp->exclusionFeatures->pluck('id')->all() : []);
   $selectedRelatedIds = old('related_ids', $hp ? $hp->relatedPackages->pluck('id')->all() : []);
@@ -261,28 +260,14 @@
     <div class="pkg-section-heading">
       <span class="pkg-section-icon"><i class="fas fa-align-left"></i></span>
       <div>
-        <h5>Overview &amp; Highlights</h5>
-        <p>The main package description and the activities featured as highlights.</p>
+        <h5>Overview</h5>
+        <p>The main package description.</p>
       </div>
     </div>
     <div class="form-group">
       <label for="overview">Overview Description <small class="text-muted">(e.g. "Escape to the sun-kissed shores of Goa with our handpicked 5-day package...")</small></label>
       <textarea name="overview" id="overview" rows="5" class="form-control rich-text-editor" placeholder="e.g. Escape to the sun-kissed shores of Goa with our handpicked 5-day package...">{{ old('overview', $hp->overview ?? '') }}</textarea>
     </div>
-
-    <label class="d-block">Highlight Activities</label>
-    <div class="d-flex flex-wrap" style="gap:16px;">
-      @forelse($activities as $activity)
-        <div class="custom-control custom-checkbox">
-          <input type="checkbox" name="activity_ids[]" value="{{ $activity->id }}" class="custom-control-input" id="act_{{ $activity->id }}"
-            {{ in_array($activity->id, $selectedActivityIds) ? 'checked' : '' }}>
-          <label class="custom-control-label" for="act_{{ $activity->id }}">{{ $activity->name }}</label>
-        </div>
-      @empty
-        <span class="text-muted">No activities available yet.</span>
-      @endforelse
-    </div>
-    <div id="aiActivitySuggestions" class="mt-2"></div>
   </div>
 
   <!-- ══════════ SEO ══════════ -->

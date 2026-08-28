@@ -54,6 +54,7 @@ class InstructionsSheet implements FromArray, WithHeadings, WithTitle
             ['detail', 'Optional', 'Plain text — the day\'s full description.'],
             ['bullet_points', 'Optional', 'Semicolon-separated list, e.g. "Airport pickup included;Welcome drink on arrival".'],
             ['meal_tags', 'Optional', 'Comma-separated, only these values are valid: breakfast, lunch, dinner.'],
+            ['image_urls', 'Optional', 'Comma-separated direct image URLs for this day. Each is downloaded and stored locally; a URL that fails to download is silently skipped.'],
             ['', '', ''],
 
             ['Room Types column', 'Required?', 'Format / Notes'],

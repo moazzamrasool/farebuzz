@@ -476,6 +476,10 @@ body, .content-wrapper, .main-sidebar, .crm-topbar,
 .photo-remove-btn:hover { background: #fecaca; }
 .photo-cover-badge { position: absolute; top: 20px; left: 20px; background: #16a34a; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 9999px; z-index: 2; letter-spacing: .03em; }
 
+/* Itinerary day-images repeater (nested inside each day row) */
+.itin-img-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px; background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.04); }
+.itin-img-card .img-upload-box { min-height: 100px; }
+
 /* ══════════════════════════════════════════════════════════════
    Dashboard — KPI cards, chart cards, top packages, review feed
    ══════════════════════════════════════════════════════════════ */

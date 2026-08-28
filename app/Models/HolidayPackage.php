@@ -88,28 +88,18 @@ class HolidayPackage extends Model
         $this->save();
     }
 
-    // Star ratings of every attached hotel, formatted as a range. Property-type
-    // annotations an admin might want (e.g. "+ Houseboat") aren't derivable from
-    // star rating alone — that's what the override exists for.
+    // Default hotel category copy for every package with at least one rated hotel
+    // attached — deliberately ignores the actual star ratings (business default is
+    // "3 Star Hotels" regardless of attached stock). Property-type annotations an
+    // admin might want (e.g. "+ Houseboat") aren't derivable from this — that's what
+    // the override exists for.
     public function deriveHotelCategory(): ?string
     {
-        $stars = $this->hotels->pluck('star_rating')
+        $hasRatedHotel = $this->hotels->pluck('star_rating')
             ->filter(fn ($rating) => $rating > 0)
-            ->unique()
-            ->sort()
-            ->values();
+            ->isNotEmpty();
 
-        if ($stars->isEmpty()) {
-            return null;
-        }
-        if ($stars->count() === 1) {
-            return $stars->first().' Star Hotels';
-        }
-        if ($stars->count() === 2) {
-            return $stars->first().' & '.$stars->last().' Star Hotels';
-        }
-
-        return $stars->first().' to '.$stars->last().' Star Hotels';
+        return $hasRatedHotel ? '3 Star Hotels' : null;
     }
 
     // Day-by-day meal_tags on the itinerary, collapsed to a short phrase. Reads coarse
@@ -133,8 +123,10 @@ class HolidayPackage extends Model
             return null;
         }
 
+        // Lunch is tracked above (for the all-meals-empty check) but deliberately never
+        // surfaced here — the displayed Meals text should never mention Lunch.
         $extras = [];
-        foreach (['lunch', 'dinner'] as $meal) {
+        foreach (['dinner'] as $meal) {
             if ($counts[$meal] > 0) {
                 $extras[] = $counts[$meal].' '.ucfirst($meal).($counts[$meal] > 1 ? 's' : '');
             }

@@ -56,8 +56,8 @@ class PackageController extends Controller
         abort_unless($package->status === 'active' && $package->unique_id === SiteTenant::id(), 404);
 
         $package->load([
-            'destination', 'categories', 'activities', 'optionalActivities', 'inclusionFeatures', 'exclusionFeatures',
-            'customInclusions', 'customExclusions', 'hotels.amenities', 'hotels.roomTypes', 'itineraries', 'photos', 'faqs', 'reviews',
+            'destination', 'categories', 'optionalActivities', 'inclusionFeatures', 'exclusionFeatures',
+            'customInclusions', 'customExclusions', 'hotels.amenities', 'hotels.roomTypes', 'itineraries.images', 'photos', 'faqs', 'reviews',
         ]);
 
         $related = $package->displayRelatedPackages(4)

@@ -46,8 +46,6 @@ class HolidayPackageRequest extends FormRequest
 
             // Overview
             'overview'         => 'nullable|string',
-            'activity_ids'     => 'nullable|array',
-            'activity_ids.*'   => 'exists:activities,id',
 
             // SEO
             'meta_title'       => 'nullable|string|max:255',
@@ -97,6 +95,7 @@ class HolidayPackageRequest extends FormRequest
             // Itinerary — day-by-day content; day_number is the source of truth the
             // frontend day plan and the Hotels/Activities day pickers key off.
             'itineraries'                   => 'nullable|array',
+            'itineraries.*.id'              => 'nullable|integer|exists:package_itineraries,id',
             'itineraries.*.day_number'      => 'nullable|integer|min:1',
             'itineraries.*.title'           => 'nullable|string|max:255',
             'itineraries.*.route_summary'   => 'nullable|string|max:255',
@@ -104,6 +103,13 @@ class HolidayPackageRequest extends FormRequest
             'itineraries.*.bullet_points'   => 'nullable|string',
             'itineraries.*.meal_tags'       => 'nullable|array',
             'itineraries.*.meal_tags.*'     => 'string|in:breakfast,lunch,dinner',
+
+            // Day images — optional, multiple per itinerary day.
+            'itineraries.*.images'             => 'nullable|array',
+            'itineraries.*.images.*.id'        => 'nullable|integer|exists:package_itinerary_images,id',
+            'itineraries.*.images.*.file'      => 'nullable|image|max:4096',
+            'itineraries.*.images.*.caption'   => 'nullable|string|max:255',
+            'itineraries.*.images.*.alt_text'  => 'nullable|string|max:255',
 
             // Photos
             'photos'              => 'nullable|array',

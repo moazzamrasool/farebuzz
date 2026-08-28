@@ -517,19 +517,22 @@
 
       $repeater.on('click', '[data-repeater-add]', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         var index = counter++;
         var html = $template[0].innerHTML.split('__INDEX__').join(index);
         var $row = $(html);
         $rows.append($row);
         initImageUpload($row);
         initRichText($row);
+        initRepeater($row);
         renumberRepeaterRows($repeater);
       });
 
       $repeater.on('click', '[data-repeater-remove]', function (e) {
         e.preventDefault();
+        e.stopPropagation();
         var $row = $(this).closest('[data-repeater-row]');
-        var isSaved = !!$row.find('input[type="hidden"][name$="[id]"]').val();
+        var isSaved = !!$row.find('input[type="hidden"][name$="[id]"]').first().val();
         if (isSaved && !window.confirm('Remove this item? It will be deleted once you save.')) {
           return;
         }
