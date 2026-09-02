@@ -327,7 +327,7 @@ class HomepageContentSeeder extends Seeder
             'social_twitter' => '#',
             'social_instagram' => '#',
             'social_youtube' => '#',
-            'copyright_text' => '© 2025 FareBuzzer. All rights reserved.',
+            'copyright_text' => '© 2026 FareBuzzer Travel Pvt Ltd. All rights reserved.',
         ]);
 
         $this->seedOnce($section, [
