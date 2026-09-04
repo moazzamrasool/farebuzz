@@ -6,12 +6,23 @@
         <div class="container-fluid">
             <div class="row">
           <div class="col-12">
+
+            @if($errors->any())
+              <div class="alert alert-danger">
+                <ul class="mb-0">
+                  @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                  @endforeach
+                </ul>
+              </div>
+            @endif
+
             <div class="card">
               <div class="card-header">
                 <h3 class="card-title">Add Blog Post</h3>
               </div>
               <div class="card-body">
-                <form action="{{ route('crm.blogs.store') }}" method="POST" enctype="multipart/form-data">
+                <form id="blogForm" action="{{ route('crm.blogs.store') }}" method="POST" enctype="multipart/form-data">
                   @include('admin.blogs._form')
                 </form>
               </div>

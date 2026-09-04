@@ -32,6 +32,14 @@ class BlogController extends Controller
 
         Blog::create($data);
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Blog post created successfully.',
+                'redirect' => route('crm.blogs.index'),
+            ]);
+        }
+
         return redirect()->route('crm.blogs.index')
             ->with('success', 'Blog post created successfully.');
     }
@@ -54,6 +62,14 @@ class BlogController extends Controller
         }
 
         $blog->update($data);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Blog post updated successfully.',
+                'redirect' => route('crm.blogs.index'),
+            ]);
+        }
 
         return redirect()->route('crm.blogs.index')
             ->with('success', 'Blog post updated successfully.');

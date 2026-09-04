@@ -36,14 +36,14 @@
     <input type="text" name="meta_title" id="meta_title" class="form-control @error('meta_title') is-invalid @enderror"
       value="{{ old('meta_title', $seo?->meta_title) }}" maxlength="255">
     <small class="form-text text-muted"><span id="metaTitleCount">0</span>/60 characters</small>
-    @error('meta_title') <span class="text-danger">{{ $message }}</span> @enderror
+    <span class="text-danger d-block" data-error-for="meta_title">@error('meta_title'){{ $message }}@enderror</span>
   </div>
 
   <div class="form-group">
     <label for="meta_description">Meta Description <small class="text-muted">(ideal 150–160 characters)</small></label>
     <textarea name="meta_description" id="meta_description" rows="3" maxlength="500" class="form-control @error('meta_description') is-invalid @enderror">{{ old('meta_description', $seo?->meta_description) }}</textarea>
     <small class="form-text text-muted"><span id="metaDescriptionCount">0</span>/160 characters</small>
-    @error('meta_description') <span class="text-danger">{{ $message }}</span> @enderror
+    <span class="text-danger d-block" data-error-for="meta_description">@error('meta_description'){{ $message }}@enderror</span>
   </div>
 
   <div class="form-row">
@@ -51,13 +51,13 @@
       <label for="meta_keywords">Meta Keywords <small class="text-muted">(comma-separated)</small></label>
       <input type="text" name="meta_keywords" id="meta_keywords" class="form-control @error('meta_keywords') is-invalid @enderror"
         value="{{ old('meta_keywords', $seo?->meta_keywords) }}" placeholder="e.g. goa packages, beach holiday">
-      @error('meta_keywords') <span class="text-danger">{{ $message }}</span> @enderror
+      <span class="text-danger d-block" data-error-for="meta_keywords">@error('meta_keywords'){{ $message }}@enderror</span>
     </div>
     <div class="form-group col-md-6">
       <label for="focus_keyword">Focus Keyword</label>
       <input type="text" name="focus_keyword" id="focus_keyword" class="form-control @error('focus_keyword') is-invalid @enderror"
         value="{{ old('focus_keyword', $seo?->focus_keyword) }}" placeholder="e.g. goa holiday package">
-      @error('focus_keyword') <span class="text-danger">{{ $message }}</span> @enderror
+      <span class="text-danger d-block" data-error-for="focus_keyword">@error('focus_keyword'){{ $message }}@enderror</span>
     </div>
   </div>
 
@@ -65,7 +65,7 @@
     <label for="tags">Tags <small class="text-muted">(comma-separated)</small></label>
     <input type="text" name="tags" id="tags" class="form-control @error('tags') is-invalid @enderror"
       value="{{ old('tags', $seo?->tags) }}" placeholder="e.g. goa, beach, honeymoon">
-    @error('tags') <span class="text-danger">{{ $message }}</span> @enderror
+    <span class="text-danger d-block" data-error-for="tags">@error('tags'){{ $message }}@enderror</span>
   </div>
 
   <div class="form-group">
@@ -79,7 +79,7 @@
         Leave blank to use this page's own URL (available once saved).
       @endif
     </small>
-    @error('canonical_url') <span class="text-danger">{{ $message }}</span> @enderror
+    <span class="text-danger d-block" data-error-for="canonical_url">@error('canonical_url'){{ $message }}@enderror</span>
   </div>
 
   <div class="form-row">
@@ -87,22 +87,22 @@
       <label for="og_title">OG Title <small class="text-muted">(falls back to Meta Title)</small></label>
       <input type="text" name="og_title" id="og_title" class="form-control @error('og_title') is-invalid @enderror"
         value="{{ old('og_title', $seo?->og_title) }}">
-      @error('og_title') <span class="text-danger">{{ $message }}</span> @enderror
+      <span class="text-danger d-block" data-error-for="og_title">@error('og_title'){{ $message }}@enderror</span>
     </div>
     <div class="form-group col-md-6">
       <label for="og_image">OG Image <small class="text-muted">(1200×630 — falls back to the cover image)</small></label>
       <input type="file" name="og_image" id="og_image" class="form-control-file @error('og_image') is-invalid @enderror" accept="image/*">
-      @error('og_image') <span class="text-danger d-block">{{ $message }}</span> @enderror
-      @if($seo?->og_image)
-        <div class="mt-2"><img src="{{ asset('storage/'.$seo->og_image) }}" style="width:120px;height:70px;object-fit:cover;border-radius:6px;"></div>
-      @endif
+      <span class="text-danger d-block" data-error-for="og_image">@error('og_image'){{ $message }}@enderror</span>
+      <div class="mt-2" id="og_image_preview_wrap" style="{{ $seo?->og_image ? '' : 'display:none' }}">
+        <img id="og_image_preview" src="{{ $seo?->og_image ? asset('storage/'.$seo->og_image) : '' }}" alt="OG image preview" style="width:120px;height:70px;object-fit:cover;border-radius:6px;">
+      </div>
     </div>
   </div>
 
   <div class="form-group">
     <label for="og_description">OG Description <small class="text-muted">(falls back to Meta Description)</small></label>
     <textarea name="og_description" id="og_description" rows="2" maxlength="500" class="form-control @error('og_description') is-invalid @enderror">{{ old('og_description', $seo?->og_description) }}</textarea>
-    @error('og_description') <span class="text-danger">{{ $message }}</span> @enderror
+    <span class="text-danger d-block" data-error-for="og_description">@error('og_description'){{ $message }}@enderror</span>
   </div>
 
   <div class="form-group">
