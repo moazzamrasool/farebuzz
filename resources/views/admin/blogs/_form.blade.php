@@ -1,4 +1,18 @@
+@php
+  $currentAdmin = \Illuminate\Support\Facades\Auth::guard('admin')->user();
+  $aiBlogEnabled = $currentAdmin?->isAdmin() || $currentAdmin?->can('blog.create');
+@endphp
+
 @csrf
+
+@if($aiBlogEnabled)
+  <div class="mb-3">
+    <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#aiGenerateBlogModal">
+      <i class="fas fa-magic mr-1"></i>✨ Generate with AI
+    </button>
+    <small class="text-muted d-block d-sm-inline ml-sm-2">Drafts the fields (and a cover image) below for you to review — nothing saves until you click {{ isset($blog) ? 'Update' : 'Create' }}.</small>
+  </div>
+@endif
 
 <div class="form-row">
   <div class="form-group col-md-8">
@@ -102,6 +116,58 @@
   <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
 </button>
 <a href="{{ route('crm.blogs.index') }}" class="btn btn-secondary">Cancel</a>
+
+@if($aiBlogEnabled)
+<!-- ══════════ AI GENERATE MODAL ══════════ -->
+<div class="modal fade" id="aiGenerateBlogModal" tabindex="-1" role="dialog" aria-labelledby="aiGenerateBlogModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aiGenerateBlogModalLabel"><i class="fas fa-magic mr-1"></i>Generate Blog Post with AI</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="ai-generate-error alert alert-danger d-none" role="alert"></div>
+        <div class="form-group">
+          <label for="ai_blog_topic">What should this blog post be about?</label>
+          <textarea id="ai_blog_topic" rows="3" class="form-control" placeholder="e.g. Best places to visit in September in India, covering Kashmir, Kerala, Himachal, Rajasthan and Meghalaya"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="ai_blog_category">Category</label>
+            <select id="ai_blog_category" class="form-control">
+              @foreach(\App\Models\Blog::CATEGORIES as $value => $label)
+                <option value="{{ $value }}" {{ ($blog->category ?? 'general') === $value ? 'selected' : '' }}>{{ $label }}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="ai_blog_tone">Tone</label>
+            <select id="ai_blog_tone" class="form-control">
+              <option value="informative" selected>Informative</option>
+              <option value="casual and friendly">Casual &amp; Friendly</option>
+              <option value="persuasive and promotional">Persuasive / Promotional</option>
+              <option value="storytelling">Storytelling</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" id="aiGenerateBlogSubmitBtn" class="btn btn-primary">
+          <span class="btn-label"><i class="fas fa-magic mr-1"></i>Generate</span>
+          <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.FB_AI_GENERATE_BLOG_URL = @json(route('crm.blogs.ai-generate'));
+</script>
+<script src="{{ asset('admin/ai-blog-generate.js') }}"></script>
+@endif
 
 <script>
 (function ($) {

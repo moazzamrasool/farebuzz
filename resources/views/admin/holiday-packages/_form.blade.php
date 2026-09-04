@@ -496,6 +496,7 @@
         <div class="col-12"><span class="text-muted">No hotels available yet — add some under Master Data &gt; Hotels.</span></div>
       @endforelse
     </div>
+    <div id="hotelsPagination" class="d-flex justify-content-center mt-2"></div>
   </div>
 
   <!-- ══════════ ACTIVITIES (optional paid add-ons) ══════════ -->
@@ -574,6 +575,7 @@
         <div class="col-12"><span class="text-muted">No activities available yet — add some under Master Data &gt; Activities.</span></div>
       @endforelse
     </div>
+    <div id="activitiesPagination" class="d-flex justify-content-center mt-2"></div>
   </div>
 
   <!-- ══════════ PHOTOS ══════════ -->

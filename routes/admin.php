@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\DestinationController;
 use App\Http\Controllers\Admin\EditorUploadController;
 use App\Http\Controllers\Admin\EnquiryController as AdminEnquiryController;
 use App\Http\Controllers\Admin\ExclusionController;
+use App\Http\Controllers\Admin\AiBlogController;
 use App\Http\Controllers\Admin\AiPackageController;
 use App\Http\Controllers\Admin\HolidayPackageController;
 use App\Http\Controllers\Admin\HomepageSectionController;
@@ -306,6 +307,7 @@ Route::prefix('crm')->group(function () {
             Route::middleware('admin.permission:blog.create')->group(function () {
                 Route::get('blogs/create', [AdminBlogController::class, 'create'])->name('crm.blogs.create');
                 Route::post('blogs', [AdminBlogController::class, 'store'])->name('crm.blogs.store');
+                Route::post('blogs/ai-generate', [AiBlogController::class, 'generate'])->name('crm.blogs.ai-generate');
             });
             Route::middleware('admin.permission:blog.edit')->group(function () {
                 Route::get('blogs/{blog}/edit', [AdminBlogController::class, 'edit'])->name('crm.blogs.edit');

@@ -603,20 +603,80 @@
     renderRoomTypeDetail($(this));
   });
 
-  $(document).on('keyup', '#hotelSearch', function () {
-    var term = $(this).val().toLowerCase().trim();
-    $('.hotel-card-col').each(function () {
-      var matches = $(this).data('hotel-name').toString().indexOf(term) !== -1;
-      $(this).toggle(matches);
+  // Holiday Package Hotels/Activities tabs — search-filters the cards, then paginates
+  // the filtered set client-side (all cards stay in the DOM at all times so checked
+  // selections on other pages are still submitted with the form).
+  function initGridPagination(opts) {
+    var $cards = $(opts.cardSelector);
+    var $search = $(opts.searchSelector);
+    var $pagination = $(opts.paginationSelector);
+    var pageSize = opts.pageSize;
+    var currentPage = 1;
+
+    if (!$cards.length) return;
+
+    function filtered() {
+      var term = $search.val().toLowerCase().trim();
+      if (!term) return $cards;
+      return $cards.filter(function () {
+        return $(this).data(opts.dataAttr).toString().indexOf(term) !== -1;
+      });
+    }
+
+    function render() {
+      var $filtered = filtered();
+      var total = $filtered.length;
+      var totalPages = Math.max(1, Math.ceil(total / pageSize));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      $cards.hide();
+      $filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize).show();
+
+      $pagination.empty();
+      if (totalPages <= 1) return;
+
+      var $nav = $('<ul class="pagination pagination-sm mb-0"></ul>');
+      $nav.append('<li class="page-item' + (currentPage === 1 ? ' disabled' : '') + '"><a href="#" class="page-link" data-page="prev">&laquo;</a></li>');
+      for (var p = 1; p <= totalPages; p++) {
+        $nav.append('<li class="page-item' + (p === currentPage ? ' active' : '') + '"><a href="#" class="page-link" data-page="' + p + '">' + p + '</a></li>');
+      }
+      $nav.append('<li class="page-item' + (currentPage === totalPages ? ' disabled' : '') + '"><a href="#" class="page-link" data-page="next">&raquo;</a></li>');
+      $pagination.append($nav);
+    }
+
+    $pagination.on('click', '.page-link', function (e) {
+      e.preventDefault();
+      if ($(this).closest('.page-item').hasClass('disabled')) return;
+      var page = $(this).data('page');
+      var totalPages = Math.max(1, Math.ceil(filtered().length / pageSize));
+      if (page === 'prev') currentPage = Math.max(1, currentPage - 1);
+      else if (page === 'next') currentPage = Math.min(totalPages, currentPage + 1);
+      else currentPage = parseInt(page, 10);
+      render();
     });
+
+    $search.on('keyup', function () {
+      currentPage = 1;
+      render();
+    });
+
+    render();
+  }
+
+  initGridPagination({
+    cardSelector: '.hotel-card-col',
+    searchSelector: '#hotelSearch',
+    paginationSelector: '#hotelsPagination',
+    dataAttr: 'hotel-name',
+    pageSize: 9
   });
 
-  $(document).on('keyup', '#activitySearch', function () {
-    var term = $(this).val().toLowerCase().trim();
-    $('.activity-card-col').each(function () {
-      var matches = $(this).data('activity-name').toString().indexOf(term) !== -1;
-      $(this).toggle(matches);
-    });
+  initGridPagination({
+    cardSelector: '.activity-card-col',
+    searchSelector: '#activitySearch',
+    paginationSelector: '#activitiesPagination',
+    dataAttr: 'activity-name',
+    pageSize: 9
   });
 
   // Holiday Package "Basic" tab — Nights/Days, Hotel Category and Meals are all derived
