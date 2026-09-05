@@ -1,7 +1,7 @@
 @php $item = $item ?? null; @endphp
 <div class="card mb-2" data-repeater-row>
   <div class="card-body">
-    <input type="hidden" name="reviews[{{ $index }}][id]" value="{{ $item->id ?? '' }}">
+    <input type="hidden" name="reviews[{{ $index }}][id]" class="pkg-row-id" value="{{ $item->id ?? '' }}">
     <div class="d-flex justify-content-between align-items-center mb-2">
       <strong>Review <span data-repeater-index></span></strong>
       <button type="button" class="btn btn-danger btn-sm" data-repeater-remove>&times; Remove</button>

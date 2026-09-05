@@ -514,12 +514,16 @@
       var $rows = $repeater.children('[data-repeater-rows]').first();
       var $template = $repeater.children('template[data-repeater-template]').first();
       var counter = $rows.children().length;
+      // A nested repeater (e.g. itinerary day images inside an itinerary row) uses its
+      // own placeholder token so an outer repeater's "__INDEX__" replacement — run first,
+      // while cloning a whole new day row — doesn't also clobber the inner per-image index.
+      var placeholder = $repeater.attr('data-repeater-placeholder') || '__INDEX__';
 
       $repeater.on('click', '[data-repeater-add]', function (e) {
         e.preventDefault();
         e.stopPropagation();
         var index = counter++;
-        var html = $template[0].innerHTML.split('__INDEX__').join(index);
+        var html = $template[0].innerHTML.split(placeholder).join(index);
         var $row = $(html);
         $rows.append($row);
         initImageUpload($row);

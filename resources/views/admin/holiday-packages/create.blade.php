@@ -12,7 +12,7 @@
                 <h3 class="card-title">Add Holiday Package</h3>
               </div>
               <div class="card-body">
-                <form action="{{ route('crm.holiday-packages.store') }}" method="POST" enctype="multipart/form-data">
+                <form id="packageForm" action="{{ route('crm.holiday-packages.store') }}" method="POST" enctype="multipart/form-data" novalidate>
                   @include('admin.holiday-packages._form')
                 </form>
               </div>

@@ -1,6 +1,6 @@
 @php $item = $item ?? null; @endphp
 <div class="photo-card" data-repeater-row>
-  <input type="hidden" name="photos[{{ $index }}][id]" value="{{ $item->id ?? '' }}">
+  <input type="hidden" name="photos[{{ $index }}][id]" class="pkg-row-id" value="{{ $item->id ?? '' }}">
 
   @if($item && $item->is_cover)
     <span class="photo-cover-badge">Cover</span>

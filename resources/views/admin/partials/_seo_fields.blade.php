@@ -147,5 +147,21 @@
 
   bindCounter('meta_title', 'metaTitleCount', 60, 'seoPreviewTitle');
   bindCounter('meta_description', 'metaDescriptionCount', 160, 'seoPreviewDescription');
+
+  var ogImageInput = document.getElementById('og_image');
+  var ogImageWrap = document.getElementById('og_image_preview_wrap');
+  var ogImagePreview = document.getElementById('og_image_preview');
+  if (ogImageInput && ogImageWrap && ogImagePreview) {
+    ogImageInput.addEventListener('change', function () {
+      var file = this.files && this.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        ogImagePreview.src = e.target.result;
+        ogImageWrap.style.display = '';
+      };
+      reader.readAsDataURL(file);
+    });
+  }
 })();
 </script>

@@ -1,6 +1,6 @@
 @php $img = $img ?? null; @endphp
 <div class="itin-img-card" data-repeater-row style="width:150px;">
-  <input type="hidden" name="itineraries[{{ $dayIndex }}][images][{{ $imgIndex }}][id]" value="{{ $img->id ?? '' }}">
+  <input type="hidden" name="itineraries[{{ $dayIndex }}][images][{{ $imgIndex }}][id]" class="pkg-image-id" value="{{ $img->id ?? '' }}">
 
   <div class="img-upload" data-multiple="false">
     <input type="file" name="itineraries[{{ $dayIndex }}][images][{{ $imgIndex }}][file]" class="img-upload-input d-none" accept="image/*">

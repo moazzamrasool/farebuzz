@@ -681,7 +681,10 @@
 </div>
 
 <div class="pkg-form-actions">
-  <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i>{{ $hp ? 'Update' : 'Create' }} Holiday Package</button>
+  <button type="submit" id="pkgSubmitBtn" class="btn btn-primary">
+    <span class="btn-label"><i class="fas fa-save mr-1"></i>{{ $hp ? 'Update' : 'Create' }} Holiday Package</span>
+    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+  </button>
   <a href="{{ route('crm.holiday-packages.index') }}" class="btn btn-secondary">Cancel</a>
 </div>
 
@@ -731,13 +734,17 @@
           </div>
           <div class="form-group col-md-4">
             <label for="ai_traveller_type">Traveller Type</label>
-            <select id="ai_traveller_type" class="form-control">
-              <option value="couple">Couple</option>
-              <option value="family">Family</option>
-              <option value="group">Group</option>
-              <option value="solo">Solo</option>
-              <option value="friends">Friends</option>
-            </select>
+            <input type="text" id="ai_traveller_type" class="form-control" list="ai_traveller_type_list" placeholder="e.g. Couple" value="Couple">
+            <datalist id="ai_traveller_type_list">
+              <option value="Couple">
+              <option value="Family">
+              <option value="Group">
+              <option value="Solo">
+              <option value="Friends">
+              <option value="Solo Female">
+              <option value="Senior Citizens">
+              <option value="Corporate / Business">
+            </datalist>
           </div>
         </div>
         <div class="form-group">
@@ -770,3 +777,195 @@
 @if($currentAdmin?->isAdmin() || $currentAdmin?->can('holiday-packages.create'))
 <script src="{{ asset('admin/ai-package-generate.js') }}"></script>
 @endif
+
+<script>
+(function ($) {
+  var $form = $('#packageForm');
+  if (!$form.length) return;
+
+  var isEditMode = {{ $hp ? 'true' : 'false' }};
+
+  // Order the tabs appear in #pkgTabs — "Save" advances one step through this list.
+  var TAB_ORDER = [
+    'tab-basic', 'tab-pricing', 'tab-overview', 'tab-seo', 'tab-itinerary',
+    'tab-inclusions', 'tab-hotels', 'tab-activities', 'tab-photos',
+    'tab-faq', 'tab-reviews', 'tab-related'
+  ];
+
+  // Fallback tab for a top-level field name when the field itself isn't found in the
+  // DOM (e.g. "room_types" fails its whole-array "min:1" rule with no row to blame).
+  var TOP_LEVEL_TAB_MAP = {
+    destination_id: 'tab-basic', title: 'tab-basic', status: 'tab-basic',
+    price: 'tab-pricing', discounted_price: 'tab-pricing', booking_type: 'tab-pricing', room_types: 'tab-pricing',
+    overview: 'tab-overview',
+    seo_content: 'tab-seo', meta_title: 'tab-seo', meta_description: 'tab-seo', meta_keywords: 'tab-seo',
+    focus_keyword: 'tab-seo', canonical_url: 'tab-seo', og_title: 'tab-seo', og_description: 'tab-seo', og_image: 'tab-seo',
+    inclusion_feature_ids: 'tab-inclusions', exclusion_feature_ids: 'tab-inclusions',
+    custom_inclusions: 'tab-inclusions', custom_exclusions: 'tab-inclusions',
+    itineraries: 'tab-itinerary', hotels: 'tab-hotels', activities: 'tab-activities',
+    photos: 'tab-photos', faqs: 'tab-faq', reviews: 'tab-reviews', related_ids: 'tab-related'
+  };
+
+  function activateTab(tabId) {
+    var $link = $('#pkgTabs a[href="#' + tabId + '"]');
+    if (!$link.length) return;
+    $link.tab('show');
+    var $card = $form.closest('.card-body');
+    $('html, body').animate({ scrollTop: ($card.length ? $card : $form).offset().top - 70 }, 300);
+  }
+
+  function goToNextTab() {
+    var currentId = $('#pkgTabs a.nav-link.active').attr('href');
+    if (!currentId) return;
+    var idx = TAB_ORDER.indexOf(currentId.replace('#', ''));
+    if (idx > -1 && idx < TAB_ORDER.length - 1) {
+      activateTab(TAB_ORDER[idx + 1]);
+    }
+  }
+
+  // Laravel error keys are dot-notation ("room_types.0.name"); form field names are
+  // bracket-notation ("room_types[0][name]") — convert so we can find/flag the input.
+  function dotToBracketName(field) {
+    var parts = field.split('.');
+    return parts[0] + parts.slice(1).map(function (p) { return '[' + p + ']'; }).join('');
+  }
+
+  function clearErrors() {
+    $form.find('.is-invalid').removeClass('is-invalid');
+  }
+
+  function setLoading(isLoading) {
+    var $btn = $('#pkgSubmitBtn');
+    $btn.prop('disabled', isLoading);
+    $btn.find('.btn-label').toggleClass('d-none', isLoading);
+    $btn.find('.spinner-border').toggleClass('d-none', !isLoading);
+  }
+
+  // After a save, upserted-by-id rows (itineraries/images/photos/faqs/reviews) need the
+  // ids they were just given written back into their hidden "[id]" inputs — otherwise the
+  // *next* save resubmits them id-less, which reads as "new rows" and deletes-then-recreates
+  // the ones just saved (destroying itinerary day-images via cascade delete).
+  function patchFlatIds(repeaterId, ids) {
+    if (!ids) return;
+    $('#' + repeaterId).children('[data-repeater-rows]').children('[data-repeater-row]').each(function (i) {
+      if (ids[i] === undefined || ids[i] === null) return;
+      $(this).find('.pkg-row-id').first().val(ids[i]);
+    });
+  }
+
+  function patchItineraryIds(itineraries) {
+    if (!itineraries) return;
+    $('#itineraryRepeater').children('[data-repeater-rows]').children('[data-repeater-row]').each(function (i) {
+      var data = itineraries[i];
+      if (!data) return;
+      $(this).find('.pkg-row-id').first().val(data.id);
+      $(this).find('[data-repeater]').first().children('[data-repeater-rows]').children('[data-repeater-row]').each(function (j) {
+        if (!data.images || data.images[j] === undefined) return;
+        $(this).find('.pkg-image-id').first().val(data.images[j]);
+      });
+    });
+  }
+
+  function applySync(sync) {
+    if (!sync) return;
+    patchItineraryIds(sync.itineraries);
+    patchFlatIds('photosRepeater', sync.photos);
+    patchFlatIds('faqRepeater', sync.faqs);
+    patchFlatIds('reviewsRepeater', sync.reviews);
+  }
+
+  function switchToEditMode(response) {
+    isEditMode = true;
+    $form.attr('action', response.update_url);
+    if (!$form.find('input[name="_method"]').length) {
+      $('<input>', { type: 'hidden', name: '_method', value: 'PUT' }).appendTo($form);
+    }
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', response.redirect);
+    }
+    $('#pkgSubmitBtn .btn-label').html('<i class="fas fa-save mr-1"></i>Update Holiday Package');
+    $form.closest('.card').find('.card-title').first().text('Edit Holiday Package');
+  }
+
+  $form.off('submit.pkgForm').on('submit.pkgForm', function (e) {
+    e.preventDefault();
+
+    // Push CKEditor's live content back into its <textarea> before FormData reads it.
+    $form.find('.rich-text-editor').each(function () {
+      var editor = $(this).data('ckeditor-instance');
+      if (editor) {
+        this.value = editor.getData();
+      }
+    });
+
+    clearErrors();
+    setLoading(true);
+
+    var formData = new FormData(this);
+
+    $.ajax({
+      url: $form.attr('action'),
+      type: 'POST',
+      data: formData,
+      processData: false,
+      contentType: false,
+      dataType: 'json',
+      success: function (response) {
+        setLoading(false);
+        if (!response.success) return;
+
+        applySync(response.sync);
+        if (response.slug) {
+          $('#slug').val(response.slug);
+        }
+
+        if (typeof toastr !== 'undefined') {
+          toastr.success(response.message || 'Saved successfully.');
+        }
+
+        if (!isEditMode) {
+          switchToEditMode(response);
+        }
+
+        goToNextTab();
+      },
+      error: function (xhr) {
+        setLoading(false);
+
+        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+          var allMessages = [];
+          var $firstInvalid = null;
+          var fallbackTab = null;
+
+          $.each(xhr.responseJSON.errors, function (field, messages) {
+            var $field = $form.find('[name="' + dotToBracketName(field) + '"]');
+            if ($field.length) {
+              $field.addClass('is-invalid');
+              if (!$firstInvalid) $firstInvalid = $field.first();
+            } else if (!fallbackTab) {
+              fallbackTab = TOP_LEVEL_TAB_MAP[field.split('.')[0]] || null;
+            }
+            allMessages.push(messages[0]);
+          });
+
+          if (typeof toastr !== 'undefined') {
+            toastr.error(allMessages.join('<br>'));
+          }
+
+          if ($firstInvalid) {
+            var $pane = $firstInvalid.closest('.tab-pane');
+            if ($pane.length) activateTab($pane.attr('id'));
+            setTimeout(function () {
+              $('html, body').animate({ scrollTop: $firstInvalid.offset().top - 120 }, 300);
+            }, 300);
+          } else if (fallbackTab) {
+            activateTab(fallbackTab);
+          }
+        } else if (typeof toastr !== 'undefined') {
+          toastr.error('Something went wrong. Please try again.');
+        }
+      }
+    });
+  });
+})(jQuery);
+</script>

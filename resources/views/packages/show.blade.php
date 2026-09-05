@@ -113,9 +113,13 @@
   .meal-tag { background:#dcfce7; color:#16a34a; border-radius:12px; padding:3px 10px; font-size:11px; font-weight:600; }
   .itin-img-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-top:12px; }
   .itin-img-tile { position:relative; border-radius:8px; overflow:hidden; aspect-ratio:4/3; background:#f2f2f2; }
-  .itin-img-tile img { width:100%; height:100%; object-fit:cover; display:block; max-width:100%; }
+  .itin-img-tile img { width:100%; height:100%; object-fit:cover; display:block; max-width:100%; cursor:zoom-in; }
   .itin-img-caption { position:absolute; left:0; right:0; bottom:0; background:linear-gradient(transparent, rgba(0,0,0,.6)); color:#fff; font-size:10px; padding:10px 8px 5px; }
   @media(max-width:576px) { .itin-img-grid { grid-template-columns:repeat(2, 1fr); } }
+  #imageZoomModal .modal-dialog { max-width:900px; }
+  #imageZoomModal .modal-content { background:transparent; border:none; }
+  #imageZoomModal img { width:100%; height:auto; border-radius:8px; }
+  #imageZoomModal .btn-close { position:absolute; top:-40px; right:0; filter:invert(1); opacity:1; }
   .itin-date-badge { font-weight:700; color:var(--blue); }
   .itin-date-badge:not(:empty)::before { content:"·"; margin:0 6px; color:#ccc; }
   .itin-day-subhead { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:#888; margin:16px 0 10px; }
@@ -332,7 +336,9 @@
                   <div class="itin-img-grid">
                     @foreach($day->images as $image)
                       <div class="itin-img-tile">
-                        <img src="{{ asset('storage/'.$image->image) }}" alt="{{ $image->alt_text ?: $day->title }}" loading="lazy">
+                        <img src="{{ asset('storage/'.$image->image) }}" alt="{{ $image->alt_text ?: $day->title }}" loading="lazy"
+                          data-bs-toggle="modal" data-bs-target="#imageZoomModal" data-full-src="{{ asset('storage/'.$image->image) }}"
+                          data-full-alt="{{ $image->alt_text ?: $day->title }}">
                         @if($image->caption)
                           <span class="itin-img-caption">{{ $image->caption }}</span>
                         @endif
@@ -536,6 +542,16 @@
   @endif
 </div>
 
+{{-- Itinerary day-image zoom popup — one shared modal, <img src> swapped per click --}}
+<div class="modal fade" id="imageZoomModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <img id="imageZoomModalImg" src="" alt="">
+    </div>
+  </div>
+</div>
+
 {{-- Enquire Now modal — reuses the sidebar's own form-control-sm2/form-label-sm styling --}}
 <div class="modal fade" id="enquireModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -592,6 +608,13 @@
     body.classList.toggle('open');
     if (icon) { icon.classList.toggle('bi-chevron-down'); icon.classList.toggle('bi-chevron-up'); }
   }
+  document.querySelectorAll('.itin-img-tile img').forEach(function (img) {
+    img.addEventListener('click', function () {
+      document.getElementById('imageZoomModalImg').src = this.getAttribute('data-full-src');
+      document.getElementById('imageZoomModalImg').alt = this.getAttribute('data-full-alt') || '';
+    });
+  });
+
   document.querySelectorAll('.pkg-sticky-nav a').forEach(function (link) {
     link.addEventListener('click', function (e) {
       e.preventDefault();

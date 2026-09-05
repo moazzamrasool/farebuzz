@@ -27,7 +27,7 @@ class HolidayPackageController extends Controller
     public function index()
     {
         $holidayPackages = HolidayPackage::with(['destination', 'categories', 'photos'])
-            ->orderBy('sort_order')->latest()->paginate(15);
+            ->latest()->paginate(15);
 
         return view('admin.holiday-packages.index', compact('holidayPackages'));
     }
@@ -65,6 +65,18 @@ class HolidayPackageController extends Controller
             return $package;
         });
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Holiday package created successfully.',
+                'id' => $package->id,
+                'slug' => $package->slug,
+                'redirect' => route('crm.holiday-packages.edit', $package->id),
+                'update_url' => route('crm.holiday-packages.update', $package->id),
+                'sync' => $this->syncedRowIds($package),
+            ]);
+        }
+
         return redirect()->route('crm.holiday-packages.edit', $package->id)
             ->with('success', 'Holiday package created successfully.');
     }
@@ -100,6 +112,10 @@ class HolidayPackageController extends Controller
                 $data['slug'] = $this->generateUniqueSlug(HolidayPackage::class, $request->slug, $holidayPackage->id);
             } elseif (!$request->filled('slug') && $holidayPackage->title !== $request->title) {
                 $data['slug'] = $this->generateUniqueSlug(HolidayPackage::class, $request->title, $holidayPackage->id);
+            } elseif (!$request->filled('slug')) {
+                // Slug left blank and title unchanged — keep the existing slug rather than
+                // letting the blank submitted value null out this NOT NULL column.
+                $data['slug'] = $holidayPackage->slug;
             }
 
             if ($request->hasFile('og_image')) {
@@ -115,6 +131,17 @@ class HolidayPackageController extends Controller
             $this->syncAllSections($request, $holidayPackage);
             $holidayPackage->applyDerivedFields();
         });
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Holiday package updated successfully.',
+                'id' => $holidayPackage->id,
+                'slug' => $holidayPackage->slug,
+                'redirect' => route('crm.holiday-packages.edit', $holidayPackage->id),
+                'sync' => $this->syncedRowIds($holidayPackage),
+            ]);
+        }
 
         return redirect()->route('crm.holiday-packages.edit', $holidayPackage->id)
             ->with('success', 'Holiday package updated successfully.');
@@ -191,6 +218,28 @@ class HolidayPackageController extends Controller
             'candidatePackages'  => HolidayPackage::where('status', 'active')
                 ->when($exclude, fn ($query) => $query->where('id', '!=', $exclude->id))
                 ->orderBy('title')->get(),
+        ];
+    }
+
+    // Feeds the AJAX form's tab-by-tab autosave: itineraries/images/photos/faqs/reviews
+    // are upserted by id (see syncItineraries()/syncPhotos()/etc.), so after each save the
+    // browser must learn the ids the *newly created* rows were just given — otherwise the
+    // next autosave resubmits them with a blank id, which reads as "these are new rows" and
+    // deletes-then-recreates the ones already saved (wiping out itinerary day-images, whose
+    // FK cascadeOnDeletes with their parent itinerary row). Ids are returned in save order
+    // (sort_order), matching the order the repeater rows were submitted in, so the frontend
+    // can zip them back onto the same rows positionally.
+    private function syncedRowIds(HolidayPackage $package): array
+    {
+        return [
+            'itineraries' => $package->itineraries()->orderBy('sort_order')->with(['images' => fn ($q) => $q->orderBy('sort_order')])
+                ->get()->map(fn ($itinerary) => [
+                    'id' => $itinerary->id,
+                    'images' => $itinerary->images->pluck('id'),
+                ])->values(),
+            'photos'  => $package->photos()->orderBy('sort_order')->pluck('id'),
+            'faqs'    => $package->faqs()->orderBy('sort_order')->pluck('id'),
+            'reviews' => $package->reviews()->orderBy('sort_order')->pluck('id'),
         ];
     }
 

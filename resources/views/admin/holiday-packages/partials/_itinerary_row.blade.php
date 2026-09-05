@@ -8,7 +8,7 @@
 @endphp
 <div class="card mb-2" data-repeater-row>
   <div class="card-body">
-    <input type="hidden" name="itineraries[{{ $index }}][id]" value="{{ $item->id ?? '' }}">
+    <input type="hidden" name="itineraries[{{ $index }}][id]" class="pkg-row-id" value="{{ $item->id ?? '' }}">
     <div class="d-flex justify-content-between align-items-center mb-2">
       <strong>Day <span data-repeater-index>{{ $index === '__INDEX__' ? '' : $index + 1 }}</span></strong>
       <button type="button" class="btn btn-danger btn-sm" data-repeater-remove>&times; Remove Day</button>
@@ -53,7 +53,7 @@
     </div>
     <div class="form-group mb-0 mt-3">
       <label class="form-label-sm d-block">Day Images <small class="text-muted">(optional, multiple)</small></label>
-      <div data-repeater>
+      <div data-repeater data-repeater-placeholder="__IMG_INDEX__">
         <div class="d-flex flex-wrap" data-repeater-rows style="gap:12px;">
           @foreach(($item->images ?? collect()) as $imgIndex => $image)
             @include('admin.holiday-packages.partials._itinerary_image_row', ['dayIndex' => $index, 'imgIndex' => $imgIndex, 'img' => $image])
