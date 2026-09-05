@@ -320,14 +320,30 @@
             <div class="fb-autocomplete-menu"></div>
           </div>
 
-          <!-- Travel Month -->
-          <div class="mmt-field-cell date-cell">
+          <!-- Travel Month — a hand-built picker, not the native <input type="month"> UI:
+               Firefox has never implemented that input type, so relying on its picker
+               (as every other date field here does via showPicker()) left this field
+               completely non-functional in Firefox. This panel works identically in
+               every browser. -->
+          <div class="mmt-field-cell date-cell" id="hp-month-cell">
             <span class="mmt-label">Travel Month <i class="bi bi-chevron-down caret-icon"></i></span>
             <div class="date-display-wrap">
               <span class="mmt-input-val" id="hp-month-val">Select Month</span>
               <span class="mmt-sub" id="hp-month-sub">Pick a month</span>
             </div>
-            <input type="month" id="hp-month" name="month" class="mmt-date-hidden"/>
+            <input type="hidden" id="hp-month" name="month"/>
+            <div class="month-picker-panel" id="hp-month-panel">
+              <div class="month-picker-header">
+                <button type="button" class="month-picker-nav" id="hp-month-prev-year" aria-label="Previous year"><i class="bi bi-chevron-left"></i></button>
+                <span id="hp-month-year-label"></span>
+                <button type="button" class="month-picker-nav" id="hp-month-next-year" aria-label="Next year"><i class="bi bi-chevron-right"></i></button>
+              </div>
+              <div class="month-picker-grid" id="hp-month-grid"></div>
+              <div class="month-picker-footer">
+                <button type="button" class="month-picker-link" id="hp-month-clear">Clear</button>
+                <button type="button" class="month-picker-link" id="hp-month-this">This month</button>
+              </div>
+            </div>
           </div>
 
           <!-- Travellers -->
