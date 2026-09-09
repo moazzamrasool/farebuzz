@@ -25,6 +25,7 @@ use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
@@ -114,6 +115,37 @@ Route::get('/hotels/{hotel:slug}',    [HotelController::class, 'show'])->name('h
 Route::get('/api/locations', [LocationController::class, 'search'])->name('api.locations');
 
 }); // end site.blocked group
+
+// ── /admin probe redirect ────────────────────────────────────────────────
+// This app's CRM has never lived at /admin (it's always been /crm — see
+// routes/admin.php), so /admin and /admin/* are pure dead weight: old
+// muscle-memory bookmarks, WordPress-scanner bots, people guessing. Send them
+// to the real admin login (or straight to the dashboard if already signed in)
+// instead of letting them fall through to the /{slug} CMS-page catch-all and
+// 404.
+//
+// Deliberately NOT inside the site.blocked group above: routes/admin.php
+// itself opts out of site.blocked (CRM auth/tenant resolution is independent
+// of the public site being suspended), so this redirect stays available on
+// the same terms as crm.login itself.
+//
+// Status codes: 301 for the guest branch — /admin has no legitimate content
+// of its own, so this is a permanent "the URL moved" signal worth letting
+// crawlers cache. 302 for the authenticated branch — that destination is a
+// function of session state, not the URL, so it must never be cached as
+// permanent (a browser that cached a 301 here could keep sending a
+// since-logged-in admin back to the login page).
+Route::get('/admin', function () {
+    return Auth::guard('admin')->check()
+        ? redirect()->route('crm.dashboard')
+        : redirect()->route('crm.login', [], 301);
+})->name('admin.redirect');
+
+Route::get('/admin/{any}', function () {
+    return Auth::guard('admin')->check()
+        ? redirect()->route('crm.dashboard')
+        : redirect()->route('crm.login', [], 301);
+})->where('any', '.*')->name('admin.redirect.any');
 
 // NOTE: /{slug} catch-all is registered in bootstrap/app.php `then` callback
 // after all admin and user routes, so it never catches /login /register /crm/*

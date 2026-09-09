@@ -9,6 +9,15 @@
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
+    # /admin and /admin/ have no page of their own — that folder only holds
+    # CRM theme assets (custom.js, dist/, plugins/) — so the generic "!-d"
+    # rule below would never forward the bare path to Laravel; it would just
+    # try to list/serve the directory. Force only the exact bare path through
+    # to index.php so routes/web.php's admin.redirect can send it on to
+    # /crm/login. Anchored with $ so real asset requests like
+    # /admin/custom.js are untouched and still served as static files.
+    RewriteRule ^admin/?$ index.php [L]
+
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
