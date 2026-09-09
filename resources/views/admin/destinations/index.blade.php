@@ -68,7 +68,7 @@
                       </td>
                       <td class="cell-created-at">{{ $destination->created_at->format('d-m-Y') }}</td>
                       <td>
-                        <button type="button" class="btn btn-primary btn-sm btn-edit-destination" data-edit-url="{{ route('crm.destinations.edit', $destination->id) }}">Edit</button>
+                        <a href="{{ route('crm.destinations.edit', $destination->id) }}" class="btn btn-primary btn-sm">Edit</a>
                         <form action="{{ route('crm.destinations.destroy', $destination->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this destination?');">
                           @csrf
                           @method('DELETE')
@@ -232,58 +232,21 @@
     var $form = $('#destinationForm');
     var storeUrl = $form.attr('action');
 
-    function setMode(mode) {
-      if (mode === 'add') {
-        $('#destinationModalLabel').text('Add Destination');
-        $('#destinationSubmitBtn .btn-label').text('Create Destination');
-        $form.attr('action', storeUrl).data('http-method', 'POST');
-      } else {
-        $('#destinationModalLabel').text('Edit Destination');
-        $('#destinationSubmitBtn .btn-label').text('Update Destination');
-      }
+    function resetToAddMode() {
+      $('#destinationModalLabel').text('Add Destination');
+      $('#destinationSubmitBtn .btn-label').text('Create Destination');
+      $form.attr('action', storeUrl).data('http-method', 'POST');
     }
 
     $('#openAddDestinationBtn').on('click', function () {
-      setMode('add');
+      resetToAddMode();
       $modal.modal('show');
     });
 
-    $(document).on('click', '.btn-edit-destination', function () {
-      var url = $(this).data('edit-url');
-      $.get(url, function (response) {
-        if (!response.success) return;
-        var d = response.destination;
-        setMode('edit');
-        $form.attr('action', d.update_url).data('http-method', 'PUT');
-        $form.find('[name="name"]').val(d.name);
-        $form.find('[name="slug"]').val(d.slug);
-        $form.find('[name="local"]').val(d.local);
-        $form.find('[name="country"]').val(d.country);
-        $form.find('[name="city"]').val(d.city);
-        var $description = $form.find('[name="description"]');
-        var descriptionEditor = $description.data('ckeditor-instance');
-        if (descriptionEditor) {
-          descriptionEditor.setData(d.description || '');
-        } else {
-          $description.val(d.description || '');
-        }
-        $form.find('[name="meta"]').val(d.meta);
-        $form.find('[name="status"]').val(d.status);
-        $form.find('[name="sort_order"]').val(d.sort_order);
-        $form.find('[name="featured"]').prop('checked', !!d.featured);
-
-        var $covers = $form.find('input[name="cover_image"]').closest('.img-upload');
-        if (d.cover_image_url) {
-          FBImageUpload.setPreview($covers, d.cover_image_url);
-        }
-        var $gallery = $form.find('input[name="gallery_images[]"]').closest('.img-upload');
-        if (d.gallery_image_urls && d.gallery_image_urls.length) {
-          FBImageUpload.setPreview($gallery, d.gallery_image_urls);
-        }
-
-        $modal.modal('show');
-      });
-    });
+    // Editing navigates to the full edit page (crm.destinations.edit) instead of
+    // this modal — the modal only ever covers the Add fields (no SEO/long-form
+    // content), so it can't safely round-trip an edit without silently leaving
+    // those fields untouched-but-invisible to the admin.
 
     // FBModalForm submits via FormData($form[0]), which only sees the hidden
     // <textarea>'s stale value — CKEditor's own auto-sync only fires on a native,
@@ -302,45 +265,16 @@
       form: '#destinationForm',
       modal: '#destinationModal',
       onSuccess: function (response) {
-        var destination = response.destination;
-        if ($('#destination-row-' + destination.id).length) {
-          updateDestinationRow(destination);
-        } else {
-          appendDestinationRow(destination);
-        }
+        appendDestinationRow(response.destination);
       },
       onReset: function () {
-        setMode('add');
+        resetToAddMode();
         var descriptionEditor = $form.find('[name="description"]').data('ckeditor-instance');
         if (descriptionEditor) {
           descriptionEditor.setData('');
         }
       }
     });
-
-    function updateDestinationRow(destination) {
-      var $row = $('#destination-row-' + destination.id);
-      var safeName = FBModalForm.escapeHtml(destination.name);
-
-      $row.find('.cell-image').html(
-        destination.cover_image_url
-          ? '<img src="' + FBModalForm.escapeHtml(destination.cover_image_url) + '" alt="' + safeName + '" style="width:50px;height:50px;object-fit:cover;border-radius:6px;">'
-          : '—'
-      );
-      $row.find('.cell-name').text(destination.name);
-      $row.find('.cell-slug').text(destination.slug);
-      $row.find('.cell-local').text(destination.local_label);
-      $row.find('.cell-location').text(destination.location);
-      $row.find('.cell-meta').text(destination.meta);
-      $row.find('.cell-featured').html(
-        destination.featured
-          ? '<span class="badge badge-info">Yes</span>'
-          : '<span class="badge badge-secondary">No</span>'
-      );
-
-      $row.addClass('row-just-updated');
-      setTimeout(function () { $row.removeClass('row-just-updated'); }, 700);
-    }
 
     function appendDestinationRow(destination) {
       $('#noDestinationsRow').remove();
@@ -372,7 +306,7 @@
           '</td>' +
           '<td class="cell-created-at">' + FBModalForm.escapeHtml(destination.created_at) + '</td>' +
           '<td>' +
-            '<button type="button" class="btn btn-primary btn-sm btn-edit-destination" data-edit-url="' + destination.edit_url + '">Edit</button> ' +
+            '<a href="' + destination.edit_url + '" class="btn btn-primary btn-sm">Edit</a> ' +
             '<form action="' + destination.destroy_url + '" method="POST" class="d-inline" onsubmit="return confirm(\'Delete this destination?\');">' +
               '@csrf' +
               '<input type="hidden" name="_method" value="DELETE">' +

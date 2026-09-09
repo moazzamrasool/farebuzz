@@ -26,7 +26,8 @@
     display: flex; align-items: center; justify-content: center; text-align: center;
   }
   .hp-hero-text h1 { color:#fff; font-size:40px; font-weight:800; margin-bottom:8px; }
-  .hp-hero-text p  { color:rgba(255,255,255,0.85); font-size:16px; max-width:640px; margin:0 auto; }
+  .hp-hero-desc, .hp-hero-desc p { color:rgba(255,255,255,0.85); font-size:16px; max-width:640px; margin:0 auto; }
+  .hp-hero-desc p { margin-top:0; margin-bottom:0; }
 
   .dest-section { margin-top:40px; }
   .dest-section-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
@@ -46,7 +47,7 @@
   <div class="hp-hero-text">
     <h1>{{ $destination->name }}</h1>
     @if($destination->description)
-      <p>{{ $destination->description }}</p>
+      <div class="hp-hero-desc">{!! $destination->description !!}</div>
     @endif
   </div>
 </section>

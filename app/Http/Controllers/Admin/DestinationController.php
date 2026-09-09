@@ -49,28 +49,6 @@ class DestinationController extends Controller
 
     public function edit(Destination $destination)
     {
-        if (request()->ajax() || request()->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'destination' => [
-                    'id'                 => $destination->id,
-                    'name'               => $destination->name,
-                    'slug'               => $destination->slug,
-                    'local'              => $destination->local,
-                    'country'            => $destination->country,
-                    'city'               => $destination->city,
-                    'description'        => $destination->description,
-                    'meta'               => $destination->meta,
-                    'status'             => $destination->status,
-                    'sort_order'         => $destination->sort_order,
-                    'featured'           => $destination->featured,
-                    'cover_image_url'    => $destination->cover_image ? asset('storage/'.$destination->cover_image) : null,
-                    'gallery_image_urls' => collect($destination->gallery_images ?? [])->map(fn ($img) => asset('storage/'.$img))->values(),
-                    'update_url'         => route('crm.destinations.update', $destination->id),
-                ],
-            ]);
-        }
-
         return view('admin.destinations.edit', compact('destination'));
     }
 
