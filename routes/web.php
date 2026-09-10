@@ -19,6 +19,7 @@ use App\Http\Controllers\CrmController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\HotelController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PackageEnquiryController;
 use App\Http\Controllers\RobotsController;
@@ -50,6 +51,13 @@ Route::post('/submit-contact-form', [DashboardController::class, 'submitContactF
 // CRM product landing page — business enquiries (not the /crm admin panel, see routes/admin.php)
 Route::get('/crm',          [CrmController::class, 'landing'])->name('crm.landing');
 Route::post('/crm/enquiry', [CrmController::class, 'storeEnquiry'])->name('crm.enquiry.store');
+
+// Standalone ad-traffic landing pages — rendered outside the main site layout,
+// see App\Http\Controllers\LandingController and resources/views/layouts/landing.blade.php
+Route::get('/kashmir-tour-package-from-bangalore', [LandingController::class, 'kashmirBangalore'])->name('landing.kashmir-bangalore');
+Route::post('/kashmir-tour-package-from-bangalore/enquiry', [LandingController::class, 'kashmirBangaloreEnquiry'])
+    ->middleware('throttle:5,1')
+    ->name('landing.kashmir-bangalore.enquiry');
 
 // ── Navbar destinations: package listings (share one design) + detail page ──
 Route::get('/india-packages',         [PackageController::class, 'india'])->name('packages.india');
