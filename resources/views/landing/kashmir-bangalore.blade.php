@@ -97,7 +97,6 @@
 
     </form>
       </div>
-      <div class="success" id="success"><div class="tick">✓</div><span class="kicker">Request received</span><h2>Thank you</h2><p class="section-copy">A travel expert will call you during business hours.</p></div>
       <div class="safe">Your final written quote should confirm price, hotel, transport and every inclusion before payment.</div>
     </aside>
   </div></section>
@@ -135,8 +134,6 @@
 <script>
   (function () {
     var form     = document.getElementById('quoteform');
-    var formwrap = document.getElementById('formwrap');
-    var success  = document.getElementById('success');
     var alertBox = document.getElementById('form-alert');
     var submitBtn = form.querySelector('.submit');
     var submitLabel = submitBtn.textContent;
@@ -185,10 +182,11 @@
           });
         })
         .then(function (result) {
-          if (result.status === 200) {
-            formwrap.style.display = 'none';
-            success.style.display = 'flex';
-            // TODO: fire a conversion event here (GTM dataLayer.push / Meta Pixel fbq('track', 'Lead')).
+          if (result.status === 200 && result.data.redirect_url) {
+            // Full navigation to the dedicated thank-you page — conversion tags live
+            // there (see kashmir-bangalore-thankyou.blade.php), not here, so they fire
+            // once per genuine submission instead of once per AJAX response.
+            window.location.href = result.data.redirect_url;
           } else if (result.status === 422) {
             showFieldErrors(result.data.errors || {});
             showAlert('Please check the highlighted fields.');

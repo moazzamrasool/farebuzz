@@ -19,9 +19,30 @@ class LandingController extends Controller
 {
     private const KASHMIR_BANGALORE_NAME = 'Kashmir Tour Package from Bangalore';
 
+    // Session key namespaced per landing page so a second lander's thank-you flow
+    // can't accidentally consume this one's guard token (or vice versa).
+    private const KASHMIR_BANGALORE_SESSION_KEY = 'landing_success.kashmir-bangalore';
+
     public function kashmirBangalore()
     {
         return view('landing.kashmir-bangalore');
+    }
+
+    public function kashmirBangaloreThankYou(Request $request)
+    {
+        // pull() reads and removes in one step — deterministic single use, unlike
+        // flash()'s "survives exactly one more request" semantics, which would still
+        // show a real thank-you (and let a conversion pixel re-fire) on a same-request
+        // double-load race. No token in session means either direct URL access or a
+        // refresh of this same page — both send the visitor back to the landing page
+        // instead of a fake confirmation.
+        $success = $request->session()->pull(self::KASHMIR_BANGALORE_SESSION_KEY);
+
+        if (!$success) {
+            return redirect()->route('landing.kashmir-bangalore');
+        }
+
+        return view('landing.kashmir-bangalore-thankyou', ['name' => $success['name'] ?? null]);
     }
 
     public function kashmirBangaloreEnquiry(Request $request)
@@ -84,10 +105,16 @@ class LandingController extends Controller
             Log::error('Kashmir landing enquiry email failed: '.$e->getMessage(), ['enquiry_id' => $enquiry->id]);
         }
 
+        // Set AFTER the save (and after mail attempts) succeeds — a validation or DB
+        // failure above returns early and never reaches here, so the guard token in
+        // kashmirBangaloreThankYou() only ever exists for a genuinely completed enquiry.
+        $request->session()->put(self::KASHMIR_BANGALORE_SESSION_KEY, ['name' => $enquiry->name]);
+        $redirectUrl = route('landing.kashmir-bangalore.thankyou');
+
         if ($request->wantsJson()) {
-            return response()->json(['success' => 'Request received. A travel expert will call you during business hours.']);
+            return response()->json(['success' => true, 'redirect_url' => $redirectUrl]);
         }
 
-        return back()->with('success', 'Request received. A travel expert will call you during business hours.');
+        return redirect($redirectUrl);
     }
 }

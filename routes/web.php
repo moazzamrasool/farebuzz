@@ -58,6 +58,7 @@ Route::get('/kashmir-tour-package-from-bangalore', [LandingController::class, 'k
 Route::post('/kashmir-tour-package-from-bangalore/enquiry', [LandingController::class, 'kashmirBangaloreEnquiry'])
     ->middleware('throttle:5,1')
     ->name('landing.kashmir-bangalore.enquiry');
+Route::get('/kashmir-tour-package-from-bangalore/thank-you', [LandingController::class, 'kashmirBangaloreThankYou'])->name('landing.kashmir-bangalore.thankyou');
 
 // ── Navbar destinations: package listings (share one design) + detail page ──
 Route::get('/india-packages',         [PackageController::class, 'india'])->name('packages.india');
