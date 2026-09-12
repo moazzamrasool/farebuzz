@@ -75,14 +75,17 @@ class HolidayPackageRequest extends FormRequest
             // hotel_id (e.g. hotels[5][price]), mirroring the Activities tab below.
             // day_number is the check-in day this hotel's stay starts on (blank = not
             // tied to a specific day, shown in the page's "General Add-ons" fallback).
+            // The form renders (and submits) a full field set for every hotel card, not
+            // just checked ones, so only validate rows the user actually attached —
+            // matching HolidayPackageController::syncHotels(), which syncs those only.
             'hotels'                    => 'nullable|array',
-            'hotels.*.room_type_id'     => 'nullable|integer|exists:hotel_room_types,id',
-            'hotels.*.price'            => 'nullable|numeric|min:0',
-            'hotels.*.is_optional'      => 'nullable|boolean',
-            'hotels.*.nights'           => 'nullable|integer|min:1',
-            'hotels.*.sort_order'       => 'nullable|integer|min:0',
-            'hotels.*.note'             => 'nullable|string|max:255',
-            'hotels.*.day_number'       => 'nullable|integer|min:1',
+            'hotels.*.room_type_id'     => 'exclude_unless:hotels.*.attach,1|nullable|integer|exists:hotel_room_types,id',
+            'hotels.*.price'            => 'exclude_unless:hotels.*.attach,1|nullable|numeric|min:0',
+            'hotels.*.is_optional'      => 'exclude_unless:hotels.*.attach,1|nullable|boolean',
+            'hotels.*.nights'           => 'exclude_unless:hotels.*.attach,1|nullable|integer|min:1',
+            'hotels.*.sort_order'       => 'exclude_unless:hotels.*.attach,1|nullable|integer|min:0',
+            'hotels.*.note'             => 'exclude_unless:hotels.*.attach,1|nullable|string|max:255',
+            'hotels.*.day_number'       => 'exclude_unless:hotels.*.attach,1|nullable|integer|min:1',
 
             // Optional paid Activities (add-ons) — entirely optional, never blocks saving.
             'activities'                    => 'nullable|array',
