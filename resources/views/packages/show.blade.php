@@ -80,10 +80,24 @@
   .pkg-rating-hero .stars { color:#fbbf24; }
 
   .pkg-sticky-nav { background:#fff; border-bottom:1px solid #e8e8e8; position:sticky; top:0; z-index:900; box-shadow:0 2px 6px rgba(0,0,0,0.06); }
-  .pkg-sticky-nav ul { list-style:none; margin:0; padding:0; display:flex; gap:0; overflow-x:auto; scrollbar-width:none; }
-  .pkg-sticky-nav ul::-webkit-scrollbar { display:none; }
-  .pkg-sticky-nav ul li a { display:block; padding:14px 22px; font-size:13px; font-weight:600; color:#555; text-decoration:none; border-bottom:3px solid transparent; white-space:nowrap; transition:color .2s, border-color .2s; }
-  .pkg-sticky-nav ul li a:hover, .pkg-sticky-nav ul li a.active { color:var(--blue); border-bottom-color:var(--blue); }
+  .pkg-nav-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  {{-- Scoped to .pkg-nav-links (not a bare "ul") so this doesn't also match the
+       share button's <ul class="dropdown-menu"> nested in the same nav bar and
+       force it visible/flex-laid-out regardless of Bootstrap's .show toggle. --}}
+  .pkg-nav-links { list-style:none; margin:0; padding:0; display:flex; gap:0; overflow-x:auto; scrollbar-width:none; }
+  .pkg-nav-links::-webkit-scrollbar { display:none; }
+  .pkg-nav-links li a { display:block; padding:14px 22px; font-size:13px; font-weight:600; color:#555; text-decoration:none; border-bottom:3px solid transparent; white-space:nowrap; transition:color .2s, border-color .2s; }
+  .pkg-nav-links li a:hover, .pkg-nav-links li a.active { color:var(--blue); border-bottom-color:var(--blue); }
+
+  .pkg-nav-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .pkg-nav-icon-btn { width:34px; height:34px; border-radius:50%; border:none; color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer; text-decoration:none; transition:filter .15s; }
+  .pkg-nav-icon-btn:hover, .pkg-nav-icon-btn:focus { filter:brightness(0.9); color:#fff; }
+  .pkg-nav-icon-btn.icon-download { background:#dc2626; }
+  .pkg-nav-icon-btn.icon-share { background:#2563eb; }
+  .pkg-nav-icon-btn.icon-link { background:#eab308; }
+  .pkg-share-menu { min-width:180px; padding:6px; border-radius:10px; border:1px solid #eee; box-shadow:0 8px 24px rgba(0,0,0,0.12); }
+  .pkg-share-menu .dropdown-item { font-size:13px; border-radius:6px; padding:8px 10px; }
+  .pkg-share-menu .dropdown-item:hover { background:#f0f6ff; color:var(--blue); }
 
   .gallery-strip { display:grid; grid-template-columns:2fr 1fr 1fr; grid-template-rows:1fr 1fr; gap:6px; border-radius:14px; overflow:hidden; height:320px; }
   .gallery-strip .g-main { grid-row:1/3; }
@@ -240,8 +254,8 @@
 </section>
 
 <nav class="pkg-sticky-nav">
-  <div class="container">
-    <ul>
+  <div class="container pkg-nav-bar">
+    <ul class="pkg-nav-links">
       <li><a href="#overview">Overview</a></li>
       @if($package->itineraries->isNotEmpty())<li><a href="#itinerary">Day Plan</a></li>@endif
       @if($inclusions->isNotEmpty() || $exclusions->isNotEmpty())<li><a href="#inclusions">Inclusions</a></li>@endif
@@ -250,6 +264,27 @@
       @if($package->reviews->isNotEmpty())<li><a href="#reviews">Reviews</a></li>@endif
       @if($package->faqs->isNotEmpty())<li><a href="#faq">FAQ</a></li>@endif
     </ul>
+    <div class="pkg-nav-actions">
+      @if($package->itineraries->isNotEmpty())
+        <a href="{{ route('packages.itinerary.download', $package->slug) }}" class="pkg-nav-icon-btn icon-download" title="Download Itinerary" aria-label="Download Itinerary">
+          <i class="bi bi-download"></i>
+        </a>
+      @endif
+      <div class="dropdown">
+        <button type="button" class="pkg-nav-icon-btn icon-share" data-bs-toggle="dropdown" aria-expanded="false" title="Share" aria-label="Share">
+          <i class="bi bi-share"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end pkg-share-menu">
+          <li><a class="dropdown-item" href="#" data-share="whatsapp"><i class="bi bi-whatsapp me-2"></i>WhatsApp</a></li>
+          <li><a class="dropdown-item" href="#" data-share="facebook"><i class="bi bi-facebook me-2"></i>Facebook</a></li>
+          <li><a class="dropdown-item" href="#" data-share="twitter"><i class="bi bi-twitter-x me-2"></i>Twitter / X</a></li>
+          <li><a class="dropdown-item" href="#" data-share="email"><i class="bi bi-envelope me-2"></i>Email</a></li>
+        </ul>
+      </div>
+      <button type="button" class="pkg-nav-icon-btn icon-link" id="btn-copy-link" title="Copy Link" aria-label="Copy Link">
+        <i class="bi bi-link-45deg"></i>
+      </button>
+    </div>
   </div>
 </nav>
 
@@ -615,7 +650,71 @@
     });
   });
 
-  document.querySelectorAll('.pkg-sticky-nav a').forEach(function (link) {
+  // Both Copy Link and Social Share use the page's own canonical URL (the
+  // public production domain from SeoResolver/CanonicalUrl — see og:url in
+  // <head>), not window.location.href. On the live site the two are the same;
+  // on local/staging, window.location.href is an unreachable host (e.g.
+  // localhost), which Facebook's scraper can't fetch, so the "Create post"
+  // composer comes up with no title/description/image at all.
+  var pkgShareUrl = @json($seo['canonical']);
+
+  // Copy Link — clipboard API where available, with a document.execCommand
+  // fallback for browsers/contexts that don't expose navigator.clipboard.
+  var copyLinkBtn = document.getElementById('btn-copy-link');
+  if (copyLinkBtn) {
+    copyLinkBtn.addEventListener('click', function () {
+      var url = pkgShareUrl;
+      var onCopied = function () {
+        var icon = copyLinkBtn.querySelector('i');
+        icon.classList.remove('bi-link-45deg');
+        icon.classList.add('bi-check2');
+        copyLinkBtn.title = 'Copied!';
+        setTimeout(function () {
+          icon.classList.remove('bi-check2');
+          icon.classList.add('bi-link-45deg');
+          copyLinkBtn.title = 'Copy Link';
+        }, 1500);
+      };
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(onCopied);
+      } else {
+        var temp = document.createElement('textarea');
+        temp.value = url;
+        temp.style.position = 'fixed';
+        temp.style.opacity = '0';
+        document.body.appendChild(temp);
+        temp.select();
+        try { document.execCommand('copy'); onCopied(); } catch (e) {}
+        document.body.removeChild(temp);
+      }
+    });
+  }
+
+  // Social Share dropdown — opens each network's own share intent in a popup,
+  // except email which hands off to the user's native mail client.
+  document.querySelectorAll('[data-share]').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      var url = encodeURIComponent(pkgShareUrl);
+      var title = encodeURIComponent(document.title);
+      var shareUrls = {
+        whatsapp: 'https://wa.me/?text=' + title + '%20' + url,
+        facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + url,
+        twitter: 'https://twitter.com/intent/tweet?url=' + url + '&text=' + title,
+        email: 'mailto:?subject=' + title + '&body=' + url,
+      };
+      var target = shareUrls[this.dataset.share];
+      if (!target) return;
+      if (this.dataset.share === 'email') {
+        window.location.href = target;
+      } else {
+        window.open(target, '_blank', 'noopener,noreferrer,width=600,height=500');
+      }
+    });
+  });
+
+  document.querySelectorAll('.pkg-nav-links a').forEach(function (link) {
     link.addEventListener('click', function (e) {
       e.preventDefault();
       var target = document.querySelector(this.getAttribute('href'));

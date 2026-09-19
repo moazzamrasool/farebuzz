@@ -8,17 +8,28 @@
   support flexbox/grid, so layout stays table/block based like the classic templates.
 --}}
 <style>
-  @page { margin: 0; size: a4 landscape; }
-  body { margin: 0; font-family: 'DejaVu Sans', sans-serif; color: #222; padding-top: 34px; padding-bottom: 36px; }
+  {{--
+    dompdf reflows `body` as one continuous box split across pages, so
+    body { padding-top/padding-bottom } only reserves space at the very start/end
+    of the document — not on every page — leaving the position:fixed header/footer
+    to overlap page content on page 2+. The fix is to reserve the space with
+    @page margin instead (applied per page) and pull the fixed bars back up/down
+    into that margin box with a negative offset. dompdf doesn't support
+    box-sizing, so the reserved margin/offset must equal `height` PLUS padding
+    (content-box): header is 34px + 10px top padding = 44px, footer is
+    34px + 6px top padding = 40px.
+  --}}
+  @page { margin: 44px 0 40px; size: a4 landscape; }
+  body { margin: 0; font-family: 'DejaVu Sans', sans-serif; color: #222; }
 
   .brand-header {
-    position: fixed; top: 0; left: 0; right: 0; height: 34px;
+    position: fixed; top: -44px; left: 0; right: 0; height: 34px;
     background: #0B2545; color: #FAF9F6; font-size: 11px; font-weight: bold;
     letter-spacing: 1px; padding: 10px 40px 0;
   }
   .brand-header img { height: 16px; vertical-align: middle; margin-right: 8px; }
   .brand-footer {
-    position: fixed; bottom: 0; left: 0; right: 0; height: 34px;
+    position: fixed; bottom: -40px; left: 0; right: 0; height: 34px;
     background: #0B2545; color: #FAF9F6; font-size: 9px; padding: 6px 40px 0;
   }
   .brand-footer .contact { color: #FAF9F6; }

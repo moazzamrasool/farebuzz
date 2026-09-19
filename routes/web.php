@@ -72,6 +72,7 @@ Route::get('/blog/{blog:slug}',       [BlogController::class, 'show'])->name('bl
 Route::get('/holiday-packages',       [PackageController::class, 'all'])->name('packages.index');
 Route::get('/holiday-packages/search',[PackageController::class, 'all'])->name('packages.search');
 Route::get('/packages/{package:slug}',[PackageController::class, 'show'])->name('packages.show');
+Route::get('/packages/{package:slug}/itinerary/download', [PackageController::class, 'downloadItinerary'])->name('packages.itinerary.download');
 
 // Enquire Now — guest-friendly lead capture, available on every package regardless of booking_type
 Route::post('/packages/{package:slug}/enquire',            [PackageEnquiryController::class, 'store'])->name('packages.enquire.store');

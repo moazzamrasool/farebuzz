@@ -6,6 +6,7 @@ use App\Models\Destination;
 use App\Models\HolidayPackage;
 use App\Models\ListingPageSeo;
 use App\Models\TravelCategory;
+use App\Services\ItineraryService;
 use App\Support\SiteTenant;
 use Closure;
 use Illuminate\Http\Request;
@@ -64,6 +65,14 @@ class PackageController extends Controller
             ->load(['destination', 'photos', 'categories', 'hotels', 'inclusionFeatures', 'customInclusions', 'reviews']);
 
         return view('packages.show', compact('package', 'related'));
+    }
+
+    public function downloadItinerary(HolidayPackage $package, ItineraryService $itineraries)
+    {
+        abort_unless($package->status === 'active' && $package->unique_id === SiteTenant::id(), 404);
+        abort_unless($itineraries->availableForPackage($package), 404, 'No itinerary is available for this package.');
+
+        return $itineraries->downloadForPackage($package);
     }
 
     // Hero search's simplified "Budget per Person" brackets → a real price range,

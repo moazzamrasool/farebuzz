@@ -70,6 +70,42 @@ class ItineraryService
         return $this->packageFor($enquiry) !== null;
     }
 
+    // Public "Download Itinerary" button on the package detail page — no booking
+    // or enquiry attached yet, so there's no traveller/reference to show, just
+    // the package's own day-by-day plan.
+    public function downloadForPackage(HolidayPackage $package)
+    {
+        return $this->pdfForPackage($this->packageWithItineraries($package), $this->metaForPackage())
+            ->download($this->filenameForPackage($package));
+    }
+
+    public function filenameForPackage(HolidayPackage $package): string
+    {
+        return "itinerary-{$package->slug}.pdf";
+    }
+
+    public function availableForPackage(HolidayPackage $package): bool
+    {
+        return $this->packageWithItineraries($package) !== null;
+    }
+
+    private function metaForPackage(): array
+    {
+        return [
+            'referenceLabel' => null,
+            'referenceValue' => null,
+            'travellerName'  => null,
+            'travelDate'     => null,
+        ];
+    }
+
+    private function packageWithItineraries(HolidayPackage $package): ?HolidayPackage
+    {
+        $package->loadMissing('itineraries');
+
+        return $package->itineraries->isNotEmpty() ? $package : null;
+    }
+
     private function metaForBooking(Booking $booking): array
     {
         return [
