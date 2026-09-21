@@ -35,6 +35,7 @@
         : $__rawCanonical;
   @endphp
   <title>{{ $__rawTitle }}</title>
+  <link rel="icon" href="{{ asset('favicon.ico') }}">
   <meta property="og:site_name" content="Farebuzzertravel">
   <meta property="og:type" content="website">
   @hasSection('meta_description')

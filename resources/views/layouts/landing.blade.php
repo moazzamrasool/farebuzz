@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>@yield('title')</title>
+  <link rel="icon" href="{{ asset('favicon.ico') }}">
   @hasSection('meta_description')
     <meta name="description" content="@yield('meta_description')">
   @endif
